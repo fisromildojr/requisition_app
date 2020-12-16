@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "330968159910",
+    "project_id": "tcc---requisition-app",
+    "storage_bucket": "tcc---requisition-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:330968159910:android:19e548f36f34e76849c667",
+        "android_client_info": {
+          "package_name": "com.tcc.tads.requisition_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "330968159910-9i2qsh296hk7vu05mpucccdlj51ne6gb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjrDYl5ZEKl2yf-HAGHVz9-oVy6IZDhn8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "330968159910-9i2qsh296hk7vu05mpucccdlj51ne6gb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
