@@ -35,6 +35,62 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
     });
   }
 
+  Future<void> _deleteDepartment(department) async {
+    Navigator.of(context).pop();
+
+    await FirebaseFirestore.instance
+        .collection('departments')
+        .doc(department.id)
+        .delete()
+        .then((_) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .snapshots()
+          .forEach((snapshot) {
+        for (var i = 0; i < snapshot.docs.length; i++) {
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(snapshot.docs[i].id)
+              .collection('departments')
+              .doc(department.id)
+              .get()
+              .then((departmentUser) {
+            if (departmentUser.exists)
+              FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(snapshot.docs[i].id)
+                  .collection('departments')
+                  .doc(department.id)
+                  .delete();
+            print('Departamento Excluído...');
+          });
+        }
+      });
+    });
+
+    // print(users[].id;
+
+    // Navigator.of(context).pop();
+    // print('Excluindo o departamento: ${department.name}');
+  }
+
+  void showAlert() {
+    AlertDialog(
+      title: Text("Exclusão"),
+      content: Text("Você deseja excluir o departamento?"),
+      actions: [
+        FlatButton(
+          child: Text('Cancel'),
+          onPressed: () => null,
+        ),
+        FlatButton(
+          child: Text('Continuar'),
+          onPressed: () => null,
+        ),
+      ],
+    );
+  }
+
   void _selectDepartment(BuildContext context, Department department) {
     Navigator.of(context).pushNamed(
       AppRoutes.SECTORS,
@@ -109,11 +165,33 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
                     // onTap: () => null,
                     onTap: () => _selectDepartment(context, department),
                     // leading: Text('T'),
-                    // trailing: IconButton(
-                    //   icon: Icon(Icons.delete),
-                    //   color: Theme.of(context).errorColor,
-                    //   onPressed: () {},
-                    // ),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      color: Theme.of(context).errorColor,
+                      onPressed: () {
+                        return showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text("Confirmação"),
+                                content: Text(
+                                    "Você deseja excluir o departamento ${department.name} ?"),
+                                actions: [
+                                  FlatButton(
+                                    child: Text('Cancel'),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                  ),
+                                  FlatButton(
+                                    child: Text('Continuar'),
+                                    onPressed: () =>
+                                        _deleteDepartment(department),
+                                  ),
+                                ],
+                              );
+                            });
+                      },
+                    ),
                   ),
                 ),
               );
