@@ -40,11 +40,11 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                 return Column(
                   children: [
                     Container(
-                      height: availableHeight * 0.4,
+                      height: availableHeight * 0.6,
                       child: DetailsUserForm(user),
                     ),
                     Container(
-                      height: availableHeight * 0.6,
+                      height: availableHeight * 0.4,
                       child: DepartmentsUserList(user),
                     ),
                   ],
