@@ -38,11 +38,34 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
   Future<void> _deleteDepartment(department) async {
     Navigator.of(context).pop();
 
-    await FirebaseFirestore.instance
+    FirebaseFirestore.instance
         .collection('departments')
         .doc(department.id)
-        .delete()
-        .then((_) {
+        .collection('sectors')
+        .snapshots()
+        .forEach((snapshotSectors) {
+      snapshotSectors.docs.forEach((docSector) {
+        docSector.reference.delete().then((_) {
+          FirebaseFirestore.instance
+              .collection('departments')
+              .doc(department.id)
+              .delete()
+              .then((_) {
+            FirebaseFirestore.instance
+                .collection('users')
+                .snapshots()
+                .forEach((snapshotUsers) {
+              snapshotUsers.docs.forEach((docUser) {
+                docUser.reference
+                    .collection('departments')
+                    .doc(department.id)
+                    .delete();
+              });
+            });
+          });
+        });
+      });
+
       FirebaseFirestore.instance
           .collection('users')
           .snapshots()
