@@ -39,9 +39,9 @@ class _DepartmentsUserListState extends State<DepartmentsUserList> {
         .collection('users')
         .doc(user.id)
         .collection('departments')
-        .doc('ntQM1YvrODAW4AMz4NKS')
+        .doc(department.id)
         .set({
-      'name': 'JATAI',
+      'name': department.name,
     });
   }
 

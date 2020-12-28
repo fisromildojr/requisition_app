@@ -11,8 +11,6 @@ class DepartmentsScreen extends StatefulWidget {
 }
 
 class _DepartmentsScreenState extends State<DepartmentsScreen> {
-  // final Department department = Department();
-
   _openDepartmentFormModal(context) {
     showModalBottomSheet(
       context: context,

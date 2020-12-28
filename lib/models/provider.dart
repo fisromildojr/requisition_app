@@ -10,8 +10,8 @@ class Provider {
 
   Provider({
     this.id,
-    @required this.fantasyName,
-    @required this.email,
+    this.fantasyName,
+    this.email,
     this.address,
     this.city,
     this.uf,

@@ -32,6 +32,18 @@ class _SectorsScreenState extends State<SectorsScreen> {
     });
   }
 
+  Future<void> _deleteSector(Sector sector) async {
+    final department = ModalRoute.of(context).settings.arguments as Department;
+    Navigator.of(context).pop();
+
+    await FirebaseFirestore.instance
+        .collection('departments')
+        .doc(department.id)
+        .collection('sectors')
+        .doc(sector.id)
+        .delete();
+  }
+
   @override
   Widget build(BuildContext context) {
     final department = ModalRoute.of(context).settings.arguments as Department;
@@ -64,24 +76,42 @@ class _SectorsScreenState extends State<SectorsScreen> {
             return ListView.builder(
               itemCount: documents.length,
               itemBuilder: (ctx, i) {
-                print(documents[i]['name']);
-                // final Department department = Department(
-                //   id: documents[i].id,
-                //   name: documents[i]['name'],
-                // );
+                final Sector sector = Sector(
+                  id: documents[i].id,
+                  name: documents[i]['name'],
+                );
                 return Container(
                   child: Card(
                     elevation: 1,
                     child: ListTile(
-                      title: Text(documents[i]['name']),
-                      // onTap: () => null,
+                      title: Text(sector.name),
                       onTap: () => null,
-                      // leading: Text('T'),
-                      // trailing: IconButton(
-                      //   icon: Icon(Icons.delete),
-                      //   color: Theme.of(context).errorColor,
-                      //   onPressed: () {},
-                      // ),
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete),
+                        color: Theme.of(context).errorColor,
+                        onPressed: () {
+                          return showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text("Confirmação"),
+                                  content: Text(
+                                      "Você deseja excluir o Centro de Custo ${sector.name} ?"),
+                                  actions: [
+                                    FlatButton(
+                                      child: Text('Cancel'),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                    ),
+                                    FlatButton(
+                                      child: Text('Continuar'),
+                                      onPressed: () => _deleteSector(sector),
+                                    ),
+                                  ],
+                                );
+                              });
+                        },
+                      ),
                     ),
                   ),
                 );

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:requisition_app/screens/auth_screen.dart';
-import 'package:requisition_app/screens/create_requisition_p1_screen.dart';
+import 'package:requisition_app/screens/requisition_form_screen.dart';
 import 'package:requisition_app/screens/departments_screen.dart';
 import 'package:requisition_app/screens/details_requisition_screen.dart';
 import 'package:requisition_app/screens/details_user_screen.dart';
@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
       routes: {
         // AppRoutes.HOME: (ctx) => HomeScreen(),
         AppRoutes.REQUISITIONS: (ctx) => RequisitionsScreen(),
-        AppRoutes.CREATE_REQUISITION_P1: (ctx) => CreateRequisitionP1(),
+        AppRoutes.REQUISITION_FORM_SCREEN: (ctx) => RequisitionFormScreen(),
         // AppRoutes.CREATE_REQUISITION_P2: (ctx) => CreateRequisitionP2(),
         // AppRoutes.CREATE_REQUISITION_P3: (ctx) => CreateRequisitionP3(),
         AppRoutes.DEPARTMENTS: (ctx) => DepartmentsScreen(),

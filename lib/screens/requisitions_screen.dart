@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:requisition_app/models/auth_data.dart';
@@ -18,6 +19,20 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
       AppRoutes.REQUISITION_DETAILS,
       arguments: requisition,
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final user = ModalRoute.of(context).settings.arguments as AuthData;
+    final fbm = FirebaseMessaging();
+
+    if (user.isAdmin) {
+      fbm.subscribeToTopic('requisition_create');
+    }
+
+    fbm.subscribeToTopic('requisition_update');
+    fbm.requestNotificationPermissions();
   }
 
   @override
@@ -67,9 +82,7 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                 .snapshots()
             : FirebaseFirestore.instance
                 .collection('requisitions')
-                // .orderBy('createdAt', descending: true)
                 .where('idUserRequested', isEqualTo: user.id)
-                // .orderBy('idUserRequested', descending: true)
                 .snapshots(),
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -251,7 +264,12 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         backgroundColor: Theme.of(context).primaryColor,
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).pushNamed(
+            AppRoutes.REQUISITION_FORM_SCREEN,
+            arguments: user,
+          );
+        },
       ),
     );
   }

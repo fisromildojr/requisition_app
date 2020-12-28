@@ -139,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       title: "Solicitar",
                       icon: Icons.add,
                       color: Colors.blue,
-                      url: AppRoutes.CREATE_REQUISITION_P1,
+                      url: AppRoutes.REQUISITION_FORM_SCREEN,
                       user: user,
                     ),
                     MenuCard(
