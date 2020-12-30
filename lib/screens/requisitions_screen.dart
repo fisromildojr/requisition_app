@@ -21,6 +21,15 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
     );
   }
 
+  Future<void> _deleteRequisition(requisition) async {
+    Navigator.of(context).pop();
+
+    FirebaseFirestore.instance
+        .collection('requisitions')
+        .doc(requisition.id)
+        .delete();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -138,14 +147,53 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                     children: [
                       Row(
                         children: [
-                          Text(
-                            documents[i]['nameDepartment'] +
-                                DateFormat(' - dd/MM/y - HH:MM')
-                                    .format(documents[i]['createdAt'].toDate()),
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
+                              child: Text(
+                                documents[i]['nameDepartment'] +
+                                    DateFormat(' - dd/MM/y - HH:MM').format(
+                                        documents[i]['createdAt'].toDate()),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ),
+                          if (documents[i]['status'] == 'PENDENTE' &&
+                              documents[i]['idUserRequested'] == user.id)
+                            IconButton(
+                              icon: Icon(Icons.delete),
+                              color: Theme.of(context).errorColor,
+                              onPressed: () {
+                                return showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Text("Confirmação"),
+                                        content: Text(
+                                            "Você deseja excluir essa requisição?"),
+                                        actions: [
+                                          FlatButton(
+                                            child: Text('Cancel'),
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
+                                          ),
+                                          FlatButton(
+                                            child: Text('Continuar'),
+                                            onPressed: () =>
+                                                _deleteRequisition(requisition),
+                                          ),
+                                        ],
+                                      );
+                                    });
+                              },
+                            ),
+                          // IconButton(
+                          // icon: Icon(Icons.delete),
+                          // color: Theme.of(context).errorColor,
+                          // onPressed: () => null,
+                          // ),
                         ],
                       ),
                       Row(
