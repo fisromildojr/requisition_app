@@ -21,7 +21,8 @@ class _RequisitionDetailsScreenState extends State<RequisitionDetailsScreen> {
         .collection('users')
         .doc(userAuth.uid)
         .get();
-    await FirebaseFirestore.instance
+
+    FirebaseFirestore.instance
         .collection('requisitions')
         .doc(requisition.id)
         .update({
@@ -29,7 +30,15 @@ class _RequisitionDetailsScreenState extends State<RequisitionDetailsScreen> {
       'solvedById': userAuth.uid,
       'status': 'APROVADO',
       'approvedIn': Timestamp.now(),
-    });
+    }).then((_) => FirebaseFirestore.instance.collection('mail').add({
+              'to': 'ludportys@gmail.com',
+              'message': {
+                'subject': 'Teste de Email',
+                'text':
+                    'Teste no envio de email quando a requisição é aprovada..',
+                'html': '<code>HTML</code> do <b>Teste 1</b>',
+              },
+            }));
   }
 
   Future<void> _disapproveRequisition(
@@ -56,6 +65,7 @@ class _RequisitionDetailsScreenState extends State<RequisitionDetailsScreen> {
     // final userAuth = FirebaseAuth.instance.currentUser;
     final requisition =
         ModalRoute.of(context).settings.arguments as Requisition;
+    final user = FirebaseAuth.instance.currentUser;
     return Scaffold(
       appBar: AppBar(
         title: Text('Detalhes'),
@@ -112,12 +122,15 @@ class _RequisitionDetailsScreenState extends State<RequisitionDetailsScreen> {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        requisition.nameDepartment +
-                            DateFormat(' - dd/MM/y - HH:MM')
-                                .format(requisition.createdAt.toDate()),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
+                        child: Text(
+                          requisition.nameDepartment +
+                              DateFormat(' - dd/MM/y - HH:MM')
+                                  .format(requisition.createdAt.toDate()),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
@@ -227,7 +240,9 @@ class _RequisitionDetailsScreenState extends State<RequisitionDetailsScreen> {
                   Row(
                     // mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      if (requisition.status != 'APROVADO')
+                      if (requisition.status == 'NEGADO' &&
+                              requisition.solvedById == user.uid ||
+                          requisition.status == 'PENDENTE')
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,12 +260,13 @@ class _RequisitionDetailsScreenState extends State<RequisitionDetailsScreen> {
                             ),
                           ],
                         ),
-                      if (requisition.status != 'APROVADO')
+                      if (requisition.status == 'NEGADO' &&
+                              requisition.solvedById == user.uid ||
+                          requisition.status == 'PENDENTE')
                         SizedBox(
                           width: 20,
                         ),
-                      if (requisition.status == 'APROVADO' ||
-                          requisition.status == 'PENDENTE')
+                      if (requisition.status == 'PENDENTE')
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.end,
