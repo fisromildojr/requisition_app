@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:requisition_app/models/auth_data.dart';
@@ -28,20 +27,6 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
         .collection('requisitions')
         .doc(requisition.id)
         .delete();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    final user = ModalRoute.of(context).settings.arguments as AuthData;
-    final fbm = FirebaseMessaging();
-
-    if (user.isAdmin) {
-      fbm.subscribeToTopic('requisition_create');
-    }
-
-    fbm.subscribeToTopic('requisition_update');
-    fbm.requestNotificationPermissions();
   }
 
   @override
@@ -113,12 +98,15 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                 solvedIn: documents[i]['solvedIn'],
                 createdAt: documents[i]['createdAt'],
                 description: documents[i]['description'],
+                idCategory: documents[i]['idCategory'],
                 idDepartment: documents[i]['idDepartment'],
                 idProvider: documents[i]['idProvider'],
                 idSector: documents[i]['idSector'],
                 idUserRequested: documents[i]['idUserRequested'],
+                nameCategory: documents[i]['nameCategory'],
                 nameDepartment: documents[i]['nameDepartment'],
                 nameProvider: documents[i]['nameProvider'],
+                emailProvider: documents[i]['emailProvider'],
                 nameSector: documents[i]['nameSector'],
                 nameUserRequested: documents[i]['nameUserRequested'],
                 paymentForecastDate: documents[i]['paymentForecastDate'],
@@ -145,11 +133,11 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                   margin: EdgeInsets.all(2),
                   child: Column(
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
+                        child: Row(
+                          children: [
+                            Expanded(
                               child: Text(
                                 documents[i]['nameDepartment'] +
                                     DateFormat(' - dd/MM/y - HH:MM').format(
@@ -159,42 +147,43 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                                 ),
                               ),
                             ),
-                          ),
-                          if (documents[i]['status'] == 'PENDENTE' &&
-                              documents[i]['idUserRequested'] == user.id)
-                            IconButton(
-                              icon: Icon(Icons.delete),
-                              color: Theme.of(context).errorColor,
-                              onPressed: () {
-                                return showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: Text("Confirmação"),
-                                        content: Text(
-                                            "Você deseja excluir essa requisição?"),
-                                        actions: [
-                                          FlatButton(
-                                            child: Text('Cancel'),
-                                            onPressed: () =>
-                                                Navigator.of(context).pop(),
-                                          ),
-                                          FlatButton(
-                                            child: Text('Continuar'),
-                                            onPressed: () =>
-                                                _deleteRequisition(requisition),
-                                          ),
-                                        ],
-                                      );
-                                    });
-                              },
-                            ),
-                          // IconButton(
-                          // icon: Icon(Icons.delete),
-                          // color: Theme.of(context).errorColor,
-                          // onPressed: () => null,
-                          // ),
-                        ],
+                            if (documents[i]['status'] == 'PENDENTE' &&
+                                documents[i]['idUserRequested'] == user.id)
+                              IconButton(
+                                icon: Icon(Icons.delete),
+                                color: Theme.of(context).errorColor,
+                                onPressed: () {
+                                  return showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: Text("Confirmação"),
+                                          content: Text(
+                                              "Você deseja excluir essa requisição?"),
+                                          actions: [
+                                            FlatButton(
+                                              child: Text('Cancel'),
+                                              onPressed: () =>
+                                                  Navigator.of(context).pop(),
+                                            ),
+                                            FlatButton(
+                                              child: Text('Continuar'),
+                                              onPressed: () =>
+                                                  _deleteRequisition(
+                                                      requisition),
+                                            ),
+                                          ],
+                                        );
+                                      });
+                                },
+                              ),
+                            // IconButton(
+                            // icon: Icon(Icons.delete),
+                            // color: Theme.of(context).errorColor,
+                            // onPressed: () => null,
+                            // ),
+                          ],
+                        ),
                       ),
                       Row(
                         children: [
@@ -204,7 +193,12 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Text(documents[i]['description']),
+                          Flexible(
+                            child: Text(
+                              documents[i]['description'],
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
                       Row(
@@ -215,7 +209,12 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Text(documents[i]['nameProvider']),
+                          Flexible(
+                            child: Text(
+                              documents[i]['nameProvider'],
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
                       Row(
@@ -226,7 +225,12 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Text(documents[i]['nameDepartment']),
+                          Flexible(
+                            child: Text(
+                              documents[i]['nameDepartment'],
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
                       Row(
@@ -237,7 +241,28 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Text(documents[i]['nameSector']),
+                          Flexible(
+                            child: Text(
+                              documents[i]['nameSector'],
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'Categoria: ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Flexible(
+                            child: Text(
+                              documents[i]['nameCategory'],
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
                       if (user.isAdmin)
@@ -249,7 +274,12 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Text(documents[i]['nameUserRequested']),
+                            Flexible(
+                              child: Text(
+                                documents[i]['nameUserRequested'],
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ],
                         ),
                       if (documents[i]['status'] == 'PENDENTE')
@@ -261,7 +291,12 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Text(documents[i]['status']),
+                            Flexible(
+                              child: Text(
+                                documents[i]['status'],
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ],
                         )
                       else if (documents[i]['status'] == 'NEGADO')
@@ -273,7 +308,12 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Text('Negado por ${documents[i]['solvedByName']}'),
+                            Flexible(
+                              child: Text(
+                                'Negado por ${documents[i]['solvedByName']}',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ],
                         )
                       else
@@ -285,15 +325,19 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Text(
-                                'Aprovado por ${documents[i]['solvedByName']}'),
+                            Flexible(
+                              child: Text(
+                                'Aprovado por ${documents[i]['solvedByName']}',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ],
                         ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
-                            'R\$ ${documents[i]['value']}',
+                            'R\$ ${documents[i]['value'].toStringAsFixed(2)}',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                             ),

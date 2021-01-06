@@ -1,17 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:flutter/foundation.dart';
 
 class Requisition {
-  String id; //id único
+  String id;
   Timestamp solvedIn;
   Timestamp createdAt;
-  String description; //descrição da solicitação
+  String description;
+  String idCategory;
   String idDepartment;
   String idProvider;
   String idSector;
   String idUserRequested;
+  String nameCategory;
   String nameDepartment;
   String nameProvider;
+  String emailProvider;
   String nameSector;
   String nameUserRequested;
   Timestamp paymentForecastDate;
@@ -26,12 +28,15 @@ class Requisition {
     this.solvedIn,
     this.createdAt,
     this.description,
+    this.idCategory,
     this.idDepartment,
     this.idProvider,
     this.idSector,
     this.idUserRequested,
+    this.nameCategory,
     this.nameDepartment,
     this.nameProvider,
+    this.emailProvider,
     this.nameSector,
     this.nameUserRequested,
     this.paymentForecastDate,

@@ -1,6 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:requisition_app/models/auth_data.dart';
 import 'package:requisition_app/utils/app_routes.dart';
@@ -23,17 +21,6 @@ class _UserScreenState extends State<UserScreen> {
       AppRoutes.USER_DETAILS,
       arguments: user,
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    final user = ModalRoute.of(context).settings.arguments as AuthData;
-    final fbm = FirebaseMessaging();
-    if (user.isAdmin) {
-      fbm.subscribeToTopic('user_create');
-    }
-    fbm.requestNotificationPermissions();
   }
 
   @override

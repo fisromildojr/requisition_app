@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:requisition_app/screens/auth_screen.dart';
+import 'package:requisition_app/screens/categories_screen.dart';
 import 'package:requisition_app/screens/requisition_form_screen.dart';
 import 'package:requisition_app/screens/departments_screen.dart';
 import 'package:requisition_app/screens/details_requisition_screen.dart';
@@ -19,6 +19,8 @@ void main() async {
   await Firebase.initializeApp();
   runApp(MyApp());
 }
+
+//Comentario Teste
 
 class MyApp extends StatelessWidget {
   @override
@@ -61,6 +63,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.USERS: (ctx) => UserScreen(),
         AppRoutes.USER_DETAILS: (ctx) => UserDetailsScreen(),
         AppRoutes.REQUISITION_DETAILS: (ctx) => RequisitionDetailsScreen(),
+        AppRoutes.CATEGORIES: (ctx) => CategoriesScreen(),
       },
     );
   }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:requisition_app/components/menu_card.dart';
 import 'package:requisition_app/models/auth_data.dart';
@@ -24,42 +25,49 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Início"),
-        actions: [
-          DropdownButtonHideUnderline(
-            child: DropdownButton(
-              icon: Icon(
-                Icons.more_vert,
-                color: Theme.of(context).primaryIconTheme.color,
-              ),
-              items: [
-                DropdownMenuItem(
-                  value: 'logout',
-                  child: Container(
-                    child: Row(
-                      children: [
-                        Icon(Icons.exit_to_app),
-                        SizedBox(width: 8),
-                        Text('Sair'),
-                      ],
-                    ),
+
+    final appBar = AppBar(
+      title: Text("Início"),
+      actions: [
+        DropdownButtonHideUnderline(
+          child: DropdownButton(
+            icon: Icon(
+              Icons.more_vert,
+              color: Theme.of(context).primaryIconTheme.color,
+            ),
+            items: [
+              DropdownMenuItem(
+                value: 'logout',
+                child: Container(
+                  child: Row(
+                    children: [
+                      Icon(Icons.exit_to_app),
+                      SizedBox(width: 8),
+                      Text('Sair'),
+                    ],
                   ),
                 ),
-              ],
-              onChanged: (item) {
-                if (item == 'logout') {
-                  FirebaseAuth.instance.signOut();
-                  Navigator.of(context).pushNamed(
-                    AppRoutes.HOME,
-                  );
-                }
-              },
-            ),
+              ),
+            ],
+            onChanged: (item) {
+              if (item == 'logout') {
+                FirebaseAuth.instance.signOut();
+                Navigator.of(context).pushNamed(
+                  AppRoutes.HOME,
+                );
+              }
+            },
           ),
-        ],
-      ),
+        ),
+      ],
+    );
+
+    final availableHeight = MediaQuery.of(context).size.height -
+        appBar.preferredSize.height -
+        MediaQuery.of(context).padding.top;
+
+    return Scaffold(
+      appBar: appBar,
 
       // drawer: Drawer(
       //   child: ListView(
@@ -128,61 +136,82 @@ class _HomeScreenState extends State<HomeScreen> {
             active: snapshot.data['active'],
             isAdmin: snapshot.data['isAdmin'],
           );
+
+          final fbm = FirebaseMessaging();
+          if (user.isAdmin) {
+            fbm.subscribeToTopic('requisition_create');
+            fbm.subscribeToTopic('user_create');
+          }
+          fbm.subscribeToTopic('requisition_update_' + user.id);
+          fbm.requestNotificationPermissions();
+
+          fbm.requestNotificationPermissions();
+
           return Stack(
             children: [
-              Container(
-                padding: EdgeInsets.all(30.0),
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  children: <Widget>[
-                    MenuCard(
-                      title: "Solicitar",
-                      icon: Icons.add,
-                      color: Colors.blue,
-                      url: AppRoutes.REQUISITION_FORM_SCREEN,
-                      user: user,
+              Column(
+                children: [
+                  // Container(
+                  //   height: availableHeight * 0.15,
+                  //   padding: EdgeInsets.all(30.0),
+                  //   child: Chart(),
+                  // ),
+                  Container(
+                    height: availableHeight * 0.85,
+                    padding: EdgeInsets.all(30.0),
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      children: <Widget>[
+                        MenuCard(
+                          title: "Solicitar",
+                          icon: Icons.add,
+                          color: Colors.blue,
+                          url: AppRoutes.REQUISITION_FORM_SCREEN,
+                          user: user,
+                        ),
+                        MenuCard(
+                          title: "Requisições",
+                          icon: Icons.description,
+                          color: Colors.deepOrange,
+                          url: AppRoutes.REQUISITIONS,
+                          user: user,
+                        ),
+                        if (user.isAdmin)
+                          MenuCard(
+                            title: "Usuários",
+                            icon: Icons.supervised_user_circle,
+                            color: Colors.orange,
+                            url: AppRoutes.USERS,
+                            user: user,
+                          ),
+                        if (user.isAdmin)
+                          MenuCard(
+                            title: "Categorias",
+                            icon: Icons.category,
+                            color: Colors.lightGreen,
+                            url: AppRoutes.CATEGORIES,
+                            user: user,
+                          ),
+                        if (user.isAdmin)
+                          MenuCard(
+                            title: "Departamentos",
+                            icon: Icons.extension,
+                            color: Colors.lightBlue,
+                            url: AppRoutes.DEPARTMENTS,
+                            user: user,
+                          ),
+                        if (user.isAdmin)
+                          MenuCard(
+                            title: "Fornecedores",
+                            icon: Icons.person_pin_circle,
+                            color: Colors.red,
+                            url: AppRoutes.PROVIDERS,
+                            user: user,
+                          ),
+                      ],
                     ),
-                    MenuCard(
-                      title: "Requisições",
-                      icon: Icons.description,
-                      color: Colors.deepOrange,
-                      url: AppRoutes.REQUISITIONS,
-                      user: user,
-                    ),
-                    if (user.isAdmin)
-                      MenuCard(
-                        title: "Usuários",
-                        icon: Icons.supervised_user_circle,
-                        color: Colors.orange,
-                        url: AppRoutes.USERS,
-                        user: user,
-                      ),
-                    if (user.isAdmin)
-                      MenuCard(
-                        title: "Relatórios",
-                        icon: Icons.assignment,
-                        color: Colors.lightGreen,
-                        url: "/reports",
-                        user: user,
-                      ),
-                    if (user.isAdmin)
-                      MenuCard(
-                        title: "Departamentos",
-                        icon: Icons.extension,
-                        color: Colors.lightBlue,
-                        url: AppRoutes.DEPARTMENTS,
-                        user: user,
-                      ),
-                    if (user.isAdmin)
-                      MenuCard(
-                        title: "Fornecedores",
-                        icon: Icons.person_pin_circle,
-                        color: Colors.red,
-                        url: AppRoutes.PROVIDERS,
-                        user: user,
-                      ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               if (!user.active)
                 Container(

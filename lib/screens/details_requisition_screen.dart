@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-// import 'package:requisition_app/models/auth_data.dart';
 import 'package:requisition_app/models/requisition.dart';
 import 'package:requisition_app/utils/app_routes.dart';
 
@@ -30,15 +29,31 @@ class _RequisitionDetailsScreenState extends State<RequisitionDetailsScreen> {
       'solvedById': userAuth.uid,
       'status': 'APROVADO',
       'approvedIn': Timestamp.now(),
-    }).then((_) => FirebaseFirestore.instance.collection('mail').add({
-              'to': 'ludportys@gmail.com',
-              'message': {
-                'subject': 'Teste de Email',
-                'text':
-                    'Teste no envio de email quando a requisição é aprovada..',
-                'html': '<code>HTML</code> do <b>Teste 1</b>',
-              },
-            }));
+    }).then((_) {
+      if (requisition.emailProvider.isNotEmpty ||
+          requisition.emailProvider != null)
+        FirebaseFirestore.instance.collection('mail').add({
+          'to': requisition.emailProvider,
+          'message': {
+            'subject': 'Requisição Aprovada',
+            'text': 'Foi aprovada uma requisição para o colaborador ' +
+                requisition.nameUserRequested,
+            'html': "<div style='margin:0 auto'><table style='text-align:center;font-size:15px;border:1px'><tr><td><br>Requisição</td></tr><tr><td style='font-size:20px;font-weight:bold'>" +
+                requisition.id +
+                "</td></tr><tr><td><br>Data da Aprova&ccedil;&atilde;o</td></tr><tr><td style='font-size:20px;font-weight:bold'>" +
+                DateFormat('dd/MM/y').format(requisition.createdAt.toDate()) +
+                "</td></tr><tr><td><br>Valor</td></tr><tr><td style='font-size:20px;font-weight:bold'>R\$ " +
+                requisition.value.toStringAsFixed(2) +
+                "</td></tr><tr><td><br>Solicitada por:</td></tr><tr><td style='font-size:20px;font-weight:bold'>" +
+                requisition.nameUserRequested +
+                "</td></tr><tr><td><br>" +
+                requisition.status +
+                " por </td></tr><tr><td style='font-size:20px;font-weight:bold'>" +
+                requisition.solvedByName +
+                "</td></tr></table></div>",
+          },
+        });
+    });
   }
 
   Future<void> _disapproveRequisition(
@@ -56,7 +71,7 @@ class _RequisitionDetailsScreenState extends State<RequisitionDetailsScreen> {
       'solvedByName': user.get('name'),
       'solvedById': userAuth.uid,
       'status': 'NEGADO',
-      'solvedIn': Timestamp.now(),
+      'solvedIn': DateTime.now(),
     });
   }
 
@@ -135,102 +150,163 @@ class _RequisitionDetailsScreenState extends State<RequisitionDetailsScreen> {
                       ),
                     ],
                   ),
-                  Row(
-                    children: [
-                      Text(
-                        'Descrição: ',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Descrição: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      Text(requisition.description),
-                    ],
+                        Expanded(
+                          child: Text(
+                            requisition.description,
+                            softWrap: true,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  Row(
-                    children: [
-                      Text(
-                        'Fornecedor: ',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Fornecedor: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      Text(requisition.nameProvider),
-                    ],
+                        Expanded(
+                          child: Text(requisition.nameProvider),
+                        ),
+                      ],
+                    ),
                   ),
-                  Row(
-                    children: [
-                      Text(
-                        'Departamento: ',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Departamento: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      Text(requisition.nameDepartment),
-                    ],
+                        Expanded(
+                          child: Text(requisition.nameDepartment),
+                        ),
+                      ],
+                    ),
                   ),
-                  Row(
-                    children: [
-                      Text(
-                        'Centro de Custo: ',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Centro de Custo: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      Text(requisition.nameSector),
-                    ],
+                        Expanded(
+                          child: Text(requisition.nameSector),
+                        ),
+                      ],
+                    ),
                   ),
-                  Row(
-                    children: [
-                      Text(
-                        'Solicitado por: ',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Categoria: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      Text(requisition.nameUserRequested),
-                    ],
+                        Expanded(
+                          child: Text(requisition.nameCategory),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Solicitado por: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(requisition.nameUserRequested),
+                        ),
+                      ],
+                    ),
                   ),
                   if (requisition.status == 'PENDENTE')
-                    Row(
-                      children: [
-                        Text(
-                          'Status: ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Status: ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        Text(requisition.status),
-                      ],
+                          Expanded(
+                            child: Text(requisition.status),
+                          ),
+                        ],
+                      ),
                     )
                   else if (requisition.status == 'NEGADO')
-                    Row(
-                      children: [
-                        Text(
-                          'Status: ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Status: ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        Text('Negado por ${requisition.solvedByName}'),
-                      ],
+                          Expanded(
+                            child:
+                                Text('Negado por ${requisition.solvedByName}'),
+                          ),
+                        ],
+                      ),
                     )
                   else
-                    Row(
-                      children: [
-                        Text(
-                          'Status: ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Status: ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        Text('Aprovado por ${requisition.solvedByName}'),
-                      ],
+                          Expanded(
+                            child: Text(
+                                'Aprovado por ${requisition.solvedByName}'),
+                          ),
+                        ],
+                      ),
                     ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Text(
-                        'R\$ ${requisition.value}',
+                        'R\$ ${requisition.value.toStringAsFixed(2)}',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                         ),

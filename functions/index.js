@@ -18,12 +18,11 @@ exports.createRequisition = functions.firestore
 
 exports.updateRequisition = functions.firestore
     .document('requisitions/{requisitionId}')
-    .onUpdate((snap, context) => {
-        console.log(snap.data());
-        admin.messaging().sendToTopic('requisition_update', {
+    .onUpdate((change, context) => {
+        admin.messaging().sendToTopic('requisition_update_' + change.after.data().idUserRequested, {
             notification: {
-                title: 'Status de Requisição Alterada para ' + snap.data().status,
-                body: 'Descrição: ' + snap.data().description,
+                title: 'Status: ' + change.after.data().status + ' por ' + change.after.data().solvedByName,
+                body: 'Descrição: ' + change.after.data().description,
                 clickAction: 'FLUTTER_NOTIFICATION_CLICK'
             }
         })

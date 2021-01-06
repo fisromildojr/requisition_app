@@ -3,17 +3,19 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:flutter/material.dart';
+import 'package:requisition_app/components/category_list.dart';
 
 import 'package:requisition_app/components/departments_list_requisition.dart';
 import 'package:requisition_app/components/provider_list.dart';
 import 'package:requisition_app/components/sector_list_requisition.dart';
 import 'package:requisition_app/models/auth_data.dart';
+import 'package:requisition_app/models/category.dart';
 import 'package:requisition_app/models/department.dart';
 import 'package:requisition_app/models/provider.dart';
-import 'package:requisition_app/models/requisition.dart';
 import 'package:requisition_app/models/sector.dart';
 
 import 'package:intl/intl.dart';
+import 'package:requisition_app/utils/app_routes.dart';
 
 class RequisitionFormScreen extends StatefulWidget {
   @override
@@ -32,6 +34,7 @@ class _RequisitionFormScreenState extends State<RequisitionFormScreen> {
   final _nameDepartmentController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _nameSectorController = TextEditingController();
+  final _nameCategoryController = TextEditingController();
   final _valueController = MoneyMaskedTextController();
 
   DateTime _selectedPurchaseDate;
@@ -40,6 +43,7 @@ class _RequisitionFormScreenState extends State<RequisitionFormScreen> {
   Provider selectedProvider;
   Department selectedDepartment;
   Sector selectedSector;
+  Category selectedCategory;
 
   _showPurchaseDatePicker() {
     showDatePicker(
@@ -103,6 +107,15 @@ class _RequisitionFormScreenState extends State<RequisitionFormScreen> {
     );
   }
 
+  _openCategoryListModal(context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) {
+        return CategoryList(_selectedCategory);
+      },
+    );
+  }
+
   _selectedProvider(Provider provider) {
     Navigator.of(context).pop();
     setState(() {
@@ -128,28 +141,40 @@ class _RequisitionFormScreenState extends State<RequisitionFormScreen> {
     });
   }
 
+  _selectedCategory(Category category) {
+    Navigator.of(context).pop();
+    setState(() {
+      this.selectedCategory = category;
+      _nameCategoryController.text = category.name;
+    });
+  }
+
   Future<void> _addRequisition() async {
     bool isValid = _formKey.currentState.validate();
     FocusScope.of(context).unfocus();
     final user = ModalRoute.of(context).settings.arguments as AuthData;
 
     if (isValid) {
-      Navigator.of(context).pop();
+      Navigator.of(context).popAndPushNamed(
+        AppRoutes.REQUISITIONS,
+        arguments: user,
+      );
       await FirebaseFirestore.instance.collection('requisitions').add({
         'solvedIn': null,
         'createdAt': Timestamp.now(),
         'description': _descriptionController.text,
+        'idCategory': selectedCategory.id,
         'idDepartment': selectedDepartment.id,
         'idProvider': selectedProvider.id,
         'idSector': selectedSector.id,
         'idUserRequested': user.id,
+        'nameCategory': selectedCategory.name,
         'nameDepartment': selectedDepartment.name,
         'nameProvider': selectedProvider.fantasyName,
+        'emailProvider': selectedProvider.email,
         'nameSector': selectedSector.name,
         'nameUserRequested': user.name,
-        // 'paymentForecastDate': Timestamp.fromDate(_selectedPaymentForecastDate),
         'paymentForecastDate': _selectedPaymentForecastDate,
-        // 'purchaseDate': Timestamp.fromDate(_selectedPurchaseDate),
         'purchaseDate': _selectedPurchaseDate,
         'solvedByName': null,
         'solvedById': null,
@@ -233,9 +258,23 @@ class _RequisitionFormScreenState extends State<RequisitionFormScreen> {
                   onTap: () => _openProviderListModal(context),
                 ),
                 TextFormField(
+                  key: ValueKey('category'),
+                  controller: _nameCategoryController,
+                  readOnly: true,
+                  decoration: InputDecoration(labelText: 'Categoria da Compra'),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Selecione uma Categoria...';
+                    }
+                    return null;
+                  },
+                  onTap: () => _openCategoryListModal(context),
+                ),
+                TextFormField(
                   key: ValueKey('value'),
                   controller: _valueController,
                   decoration: InputDecoration(labelText: 'Valor'),
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (_valueController.numberValue <= 0.00) {
                       return 'Informe um valor válido...';
