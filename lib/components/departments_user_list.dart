@@ -27,14 +27,6 @@ class _DepartmentsUserListState extends State<DepartmentsUserList> {
     final user = ModalRoute.of(context).settings.arguments as AuthData;
     Navigator.of(context).pop();
 
-    // final Future departmentsUser = await FirebaseFirestore.instance
-    //     .collection('users')
-    //     .doc(user.id)
-    //     .collection('departments')
-    //     .get();
-
-    // print(departmentsUser);
-
     await FirebaseFirestore.instance
         .collection('users')
         .doc(user.id)
@@ -55,8 +47,6 @@ class _DepartmentsUserListState extends State<DepartmentsUserList> {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          // print(snapshot.data.id);
-
           final documents = snapshot.data.documents;
           return SingleChildScrollView(
               child: Card(
@@ -99,12 +89,6 @@ class _DepartmentsUserListState extends State<DepartmentsUserList> {
                       itemCount: documents.length,
                       itemBuilder: (context, i) {
                         if (documents.length > 0) {
-                          // final department = Department(
-                          //   id: documents[i].id,
-                          //   name: documents[i]['name'],
-                          // );
-
-                          // widget.user.departments.add(department);
                           print(documents[i].id);
 
                           return Card(
@@ -112,6 +96,10 @@ class _DepartmentsUserListState extends State<DepartmentsUserList> {
                             child: ListTile(
                               title: Text(documents[i]['name']),
                             ),
+                          );
+                        } else {
+                          return Center(
+                            child: Text('Nenhum resultado retornado...'),
                           );
                         }
                       }),
@@ -122,8 +110,6 @@ class _DepartmentsUserListState extends State<DepartmentsUserList> {
         } else {
           return Center(child: CircularProgressIndicator());
         }
-
-        // if (snapshot.hasError) print(snapshot.error);
       },
     );
   }

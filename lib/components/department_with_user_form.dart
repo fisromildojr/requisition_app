@@ -14,25 +14,12 @@ class DepartmentWithUserForm extends StatefulWidget {
 }
 
 class _DepartmentWithUserFormState extends State<DepartmentWithUserForm> {
-  final _departmentNameController = TextEditingController();
-  final _departmentIdController = TextEditingController();
-
-  Future<void> _submitForm() async {
-    final department = Department(
-      id: _departmentIdController.text,
-      name: _departmentNameController.text,
-    );
-    widget.onSubmit(department);
-  }
-
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
       stream: FirebaseFirestore.instance.collection('departments').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          // final departmentsUser = Firebase
-
           final documents = snapshot.data.documents;
           return SingleChildScrollView(
               child: Card(
@@ -49,14 +36,6 @@ class _DepartmentWithUserFormState extends State<DepartmentWithUserForm> {
                           style: Theme.of(context).textTheme.headline6,
                         ),
                       ),
-                      // RaisedButton(
-                      //   elevation: 6,
-                      //   onPressed: () => null,
-                      //   // onPressed: () => _openDepartmentWithUserFormModal(
-                      //   //     context, widget.user),
-                      //   color: Colors.green,
-                      //   child: Icon(Icons.add),
-                      // ),
                     ],
                   ),
                   ListView.builder(
@@ -92,8 +71,6 @@ class _DepartmentWithUserFormState extends State<DepartmentWithUserForm> {
         } else {
           return Center(child: CircularProgressIndicator());
         }
-
-        // if (snapshot.hasError) print(snapshot.error);
       },
     );
   }

@@ -115,16 +115,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       );
                       return GestureDetector(
                         onTap: () => null,
-                        // onTap: user.isAdmin
-                        //     ? () =>
-                        //         _selectRequisition(context, requisition, user)
-                        //     : null,
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
-                            color: documents[i]['status'] == 'PENDENTE'
+                            color: requisition.status == 'PENDENTE'
                                 ? Colors.amber
-                                : documents[i]['status'] == 'NEGADO'
+                                : requisition.status == 'NEGADO'
                                     ? Colors.red
                                     : Colors.green,
                           ),
@@ -139,11 +135,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        documents[i]['nameDepartment'] +
+                                        requisition.nameDepartment +
                                             ' - ' +
                                             DateFormat('dd/MM/y - HH:mm:ss')
-                                                .format(documents[i]
-                                                        ['createdAt']
+                                                .format(requisition.createdAt
                                                     .toDate()),
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
@@ -151,8 +146,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                       ),
                                     ),
                                     Text(
-                                      documents[i]['number'] != null
-                                          ? 'Nº: ${documents[i]['number'].toString()}'
+                                      requisition.number != null
+                                          ? 'Nº: ${requisition.number.toString()}'
                                           : 'Nº: ---',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -171,7 +166,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                   ),
                                   Flexible(
                                     child: Text(
-                                      documents[i]['description'],
+                                      requisition.description,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -187,7 +182,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                   ),
                                   Flexible(
                                     child: Text(
-                                      documents[i]['nameProvider'],
+                                      requisition.nameProvider,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -203,7 +198,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                   ),
                                   Flexible(
                                     child: Text(
-                                      documents[i]['nameDepartment'],
+                                      requisition.nameDepartment,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -219,7 +214,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                   ),
                                   Flexible(
                                     child: Text(
-                                      documents[i]['nameSector'],
+                                      requisition.nameSector,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -235,7 +230,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                   ),
                                   Flexible(
                                     child: Text(
-                                      documents[i]['nameCategory'],
+                                      requisition.nameCategory,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -252,13 +247,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                     ),
                                     Flexible(
                                       child: Text(
-                                        documents[i]['nameUserRequested'],
+                                        requisition.nameUserRequested,
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ],
                                 ),
-                              if (documents[i]['status'] == 'PENDENTE')
+                              if (requisition.status == 'PENDENTE')
                                 Row(
                                   children: [
                                     Text(
@@ -269,13 +264,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                     ),
                                     Flexible(
                                       child: Text(
-                                        documents[i]['status'],
+                                        requisition.status,
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ],
                                 )
-                              else if (documents[i]['status'] == 'NEGADO')
+                              else if (requisition.status == 'NEGADO')
                                 Row(
                                   children: [
                                     Text(
@@ -286,7 +281,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                     ),
                                     Flexible(
                                       child: Text(
-                                        'Negado por ${documents[i]['solvedByName']}',
+                                        'Negado por ${requisition.solvedByName}',
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -303,7 +298,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                     ),
                                     Flexible(
                                       child: Text(
-                                        'Aprovado por ${documents[i]['solvedByName']}',
+                                        'Aprovado por ${requisition.solvedByName}',
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -313,7 +308,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Text(
-                                    'R\$ ${documents[i]['value'].toStringAsFixed(2)}',
+                                    'R\$ ${requisition.value.toStringAsFixed(2)}',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),

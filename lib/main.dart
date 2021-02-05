@@ -51,11 +51,9 @@ class MyApp extends StatelessWidget {
         },
       ),
       routes: {
-        // AppRoutes.HOME: (ctx) => HomeScreen(),
+        AppRoutes.HOME: (ctx) => HomeScreen(),
         AppRoutes.REQUISITIONS: (ctx) => RequisitionsScreen(),
         AppRoutes.REQUISITION_FORM_SCREEN: (ctx) => RequisitionFormScreen(),
-        // AppRoutes.CREATE_REQUISITION_P2: (ctx) => CreateRequisitionP2(),
-        // AppRoutes.CREATE_REQUISITION_P3: (ctx) => CreateRequisitionP3(),
         AppRoutes.DEPARTMENTS: (ctx) => DepartmentsScreen(),
         AppRoutes.SECTORS: (ctx) => SectorsScreen(),
         AppRoutes.PROVIDERS: (ctx) => ProvidersScreen(),
