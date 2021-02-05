@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:requisition_app/components/auth_form.dart';
 import 'package:requisition_app/models/auth_data.dart';
 
@@ -38,7 +37,6 @@ class _AuthScreenState extends State<AuthScreen> {
         final userData = {
           'name': authData.name,
           'email': authData.email,
-          // 'department': authData.departments,
           'active': false,
           'isAdmin': false,
         };
@@ -48,16 +46,24 @@ class _AuthScreenState extends State<AuthScreen> {
             .doc(userCredential.user.uid)
             .set(userData);
       }
-    } on PlatformException catch (err) {
-      final msg = err.message ?? 'Ocorreu um erro! Verifique suas credenciais!';
+    } catch (err) {
+      var msg = err.code ?? 'Ocorreu um erro! Verifique suas credenciais!';
+      if (err.code == "too-many-requests") msg = "Senha inválida...";
+      if (err.code == "user-not-found") msg = "Usuário não encontrado...";
+      if (err.code == "unknown") msg = "Verifique sua conexão!";
+      if (err.code == "too-many-requests")
+        msg =
+            "Bloqueamos todas as solicitações deste dispositivo devido a atividade incomum. Tente mais tarde.";
+      if (err.code == "user-disabled")
+        msg = "Usuário desabilitado, procure o administrador!";
+      print(err.code);
+      print(err.message);
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(
           content: Text(msg),
           backgroundColor: Theme.of(context).errorColor,
         ),
       );
-    } catch (err) {
-      print(err);
     } finally {
       setState(() {
         _isLoading = false;
