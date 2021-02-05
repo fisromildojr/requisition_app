@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:requisition_app/components/department_with_user_form.dart';
 import 'package:requisition_app/components/departments_user_list.dart';
 import 'package:requisition_app/components/details_user_form.dart';
 import 'package:requisition_app/models/auth_data.dart';

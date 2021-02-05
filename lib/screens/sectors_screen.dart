@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:requisition_app/components/sector_form.dart';
+import 'package:requisition_app/components/sector_update_form.dart';
 import 'package:requisition_app/models/department.dart';
 import 'package:requisition_app/models/sector.dart';
 
@@ -28,7 +29,31 @@ class _SectorsScreenState extends State<SectorsScreen> {
         .doc(department.id)
         .collection('sectors')
         .add({
-      'name': sector.name,
+      'name': sector.name.toUpperCase(),
+      'excluded': false,
+    });
+  }
+
+  _openSectorUpdateFormModal(context, sector) {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) {
+        return SectorUpdateForm(_updateSector, sector);
+      },
+    );
+  }
+
+  Future<void> _updateSector(Sector sector) async {
+    final department = ModalRoute.of(context).settings.arguments as Department;
+    Navigator.of(context).pop();
+
+    await FirebaseFirestore.instance
+        .collection('departments')
+        .doc(department.id)
+        .collection('sectors')
+        .doc(sector.id)
+        .update({
+      'name': sector.name.toUpperCase(),
     });
   }
 
@@ -41,16 +66,12 @@ class _SectorsScreenState extends State<SectorsScreen> {
         .doc(department.id)
         .collection('sectors')
         .doc(sector.id)
-        .delete();
+        .update({'excluded': true});
   }
 
   @override
   Widget build(BuildContext context) {
     final department = ModalRoute.of(context).settings.arguments as Department;
-    // final sectors = FirebaseFirestore.instance
-    //     .collection('departments')
-    //     .doc(department.id)
-    //     .get();
 
     return Scaffold(
       appBar: AppBar(
@@ -61,9 +82,10 @@ class _SectorsScreenState extends State<SectorsScreen> {
             .collection('departments')
             .doc(department.id)
             .collection('sectors')
+            .where('excluded', isEqualTo: false)
+            .orderBy('name')
             .snapshots(),
         builder: (ctx, snapshot) {
-          // print('ID do Departamento: ' + department.id);
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
               child: CircularProgressIndicator(),
@@ -79,6 +101,7 @@ class _SectorsScreenState extends State<SectorsScreen> {
                 final Sector sector = Sector(
                   id: documents[i].id,
                   name: documents[i]['name'],
+                  excluded: documents[i]['excluded'],
                 );
                 return Container(
                   child: Card(
@@ -86,31 +109,45 @@ class _SectorsScreenState extends State<SectorsScreen> {
                     child: ListTile(
                       title: Text(sector.name),
                       onTap: () => null,
-                      trailing: IconButton(
-                        icon: Icon(Icons.delete),
-                        color: Theme.of(context).errorColor,
-                        onPressed: () {
-                          return showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: Text("Confirmação"),
-                                  content: Text(
-                                      "Você deseja excluir o Centro de Custo ${sector.name} ?"),
-                                  actions: [
-                                    FlatButton(
-                                      child: Text('Cancel'),
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(),
-                                    ),
-                                    FlatButton(
-                                      child: Text('Continuar'),
-                                      onPressed: () => _deleteSector(sector),
-                                    ),
-                                  ],
-                                );
-                              });
-                        },
+                      trailing: Container(
+                        width: 100,
+                        child: Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () =>
+                                  _openSectorUpdateFormModal(context, sector),
+                              color: Colors.orange,
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete),
+                              color: Theme.of(context).errorColor,
+                              onPressed: () {
+                                return showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Text("Confirmação"),
+                                        content: Text(
+                                            "Você deseja excluir o Centro de Custo ${sector.name} ?"),
+                                        actions: [
+                                          FlatButton(
+                                            child: Text('Cancel'),
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
+                                          ),
+                                          FlatButton(
+                                            child: Text('Continuar'),
+                                            onPressed: () =>
+                                                _deleteSector(sector),
+                                          ),
+                                        ],
+                                      );
+                                    });
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

@@ -14,6 +14,8 @@ class Requisition {
   String nameDepartment;
   String nameProvider;
   String emailProvider;
+  int number;
+  String docProvider;
   String nameSector;
   String nameUserRequested;
   Timestamp paymentForecastDate;
@@ -37,6 +39,8 @@ class Requisition {
     this.nameDepartment,
     this.nameProvider,
     this.emailProvider,
+    this.number,
+    this.docProvider,
     this.nameSector,
     this.nameUserRequested,
     this.paymentForecastDate,

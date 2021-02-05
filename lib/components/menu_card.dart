@@ -28,7 +28,7 @@ class MenuCard extends StatelessWidget {
             children: <Widget>[
               Icon(
                 icon,
-                size: 70.0,
+                size: 60.0,
                 color: color,
               ),
               Text(title, style: new TextStyle(fontSize: 15.0)),

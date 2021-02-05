@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:requisition_app/models/auth_data.dart';
+import 'package:flutter/material.dart';
 
 class AuthForm extends StatefulWidget {
   final void Function(AuthData authData) onSubmit;

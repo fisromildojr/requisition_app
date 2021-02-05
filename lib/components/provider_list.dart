@@ -23,7 +23,10 @@ class _ProviderListState extends State<ProviderList> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('providers').snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('providers')
+          .orderBy('fantasyName')
+          .snapshots(),
       builder: (ctx, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(

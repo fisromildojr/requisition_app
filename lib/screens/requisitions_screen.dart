@@ -12,11 +12,16 @@ class RequisitionsScreen extends StatefulWidget {
 }
 
 class _RequisitionsScreenState extends State<RequisitionsScreen> {
+  String filter = '';
+
   void _selectRequisition(
       BuildContext context, Requisition requisition, AuthData user) {
     Navigator.of(context).pushNamed(
       AppRoutes.REQUISITION_DETAILS,
-      arguments: requisition,
+      arguments: {
+        'requisition': requisition,
+        'user': user,
+      },
     );
   }
 
@@ -36,48 +41,153 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
       appBar: AppBar(
         title: Text('Requisições'),
         actions: [
-          DropdownButtonHideUnderline(
-            child: DropdownButton(
-              icon: Icon(
-                Icons.more_vert,
-                color: Theme.of(context).primaryIconTheme.color,
-              ),
-              items: [
-                DropdownMenuItem(
-                  value: 'logout',
-                  child: Container(
-                    child: Row(
-                      children: [
-                        Icon(Icons.exit_to_app),
-                        SizedBox(width: 8),
-                        Text('Sair'),
-                      ],
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 15, 0),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton(
+                icon: Icon(
+                  Icons.filter_alt,
+                  color: Theme.of(context).primaryIconTheme.color,
+                ),
+                items: [
+                  DropdownMenuItem(
+                    value: 'aprovado',
+                    child: Container(
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.circle,
+                            color: Colors.green,
+                          ),
+                          SizedBox(width: 8),
+                          Text('Aprovados'),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-              onChanged: (item) {
-                if (item == 'logout') {
-                  FirebaseAuth.instance.signOut();
-                  Navigator.of(context).pushNamed(
-                    AppRoutes.HOME,
-                  );
-                }
-              },
+                  DropdownMenuItem(
+                    value: 'negado',
+                    child: Container(
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.circle,
+                            color: Colors.red,
+                          ),
+                          SizedBox(width: 8),
+                          Text('Negados'),
+                        ],
+                      ),
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'pendente',
+                    child: Container(
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.circle,
+                            color: Colors.amber,
+                          ),
+                          SizedBox(width: 8),
+                          Text('Pendentes'),
+                        ],
+                      ),
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'limpar',
+                    child: Container(
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.close,
+                            color: Colors.black,
+                          ),
+                          SizedBox(width: 8),
+                          Text('Limpar Filtro'),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+                onChanged: (filtro) {
+                  if (filtro == 'aprovado') {
+                    setState(() {
+                      filter = 'APROVADO';
+                    });
+                  } else if (filtro == 'negado') {
+                    setState(() {
+                      filter = 'NEGADO';
+                    });
+                  } else if (filtro == 'pendente') {
+                    setState(() {
+                      filter = 'PENDENTE';
+                    });
+                  } else
+                    setState(() {
+                      filter = '';
+                    });
+                },
+              ),
             ),
           ),
+          // DropdownButtonHideUnderline(
+          //   child: DropdownButton(
+          //     icon: Icon(
+          //       Icons.more_vert,
+          //       color: Theme.of(context).primaryIconTheme.color,
+          //     ),
+          //     items: [
+          //       DropdownMenuItem(
+          //         value: 'logout',
+          //         child: Container(
+          //           child: Row(
+          //             children: [
+          //               Icon(Icons.exit_to_app),
+          //               SizedBox(width: 8),
+          //               Text('Sair'),
+          //             ],
+          //           ),
+          //         ),
+          //       ),
+          //     ],
+          //     onChanged: (item) {
+          //       if (item == 'logout') {
+          //         FirebaseAuth.instance.signOut();
+          //         Navigator.of(context).pushNamed(
+          //           AppRoutes.HOME,
+          //         );
+          //       }
+          //     },
+          //   ),
+          // ),
         ],
       ),
       body: StreamBuilder(
         stream: user.isAdmin
-            ? FirebaseFirestore.instance
-                .collection('requisitions')
-                .orderBy('createdAt', descending: true)
-                .snapshots()
-            : FirebaseFirestore.instance
-                .collection('requisitions')
-                .where('idUserRequested', isEqualTo: user.id)
-                .snapshots(),
+            ? filter == ''
+                ? FirebaseFirestore.instance
+                    .collection('requisitions')
+                    .orderBy('createdAt', descending: true)
+                    .snapshots()
+                : FirebaseFirestore.instance
+                    .collection('requisitions')
+                    .where('status', isEqualTo: filter)
+                    .orderBy('createdAt', descending: true)
+                    .snapshots()
+            : filter == ''
+                ? FirebaseFirestore.instance
+                    .collection('requisitions')
+                    .where('idUserRequested', isEqualTo: user.id)
+                    .orderBy('createdAt', descending: true)
+                    .snapshots()
+                : FirebaseFirestore.instance
+                    .collection('requisitions')
+                    .where('idUserRequested', isEqualTo: user.id)
+                    .where('status', isEqualTo: filter)
+                    .orderBy('createdAt', descending: true)
+                    .snapshots(),
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
@@ -107,6 +217,8 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                 nameDepartment: documents[i]['nameDepartment'],
                 nameProvider: documents[i]['nameProvider'],
                 emailProvider: documents[i]['emailProvider'],
+                number: documents[i]['number'],
+                docProvider: documents[i]['docProvider'],
                 nameSector: documents[i]['nameSector'],
                 nameUserRequested: documents[i]['nameUserRequested'],
                 paymentForecastDate: documents[i]['paymentForecastDate'],
@@ -117,9 +229,10 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                 value: documents[i]['value'],
               );
               return GestureDetector(
-                onTap: user.isAdmin
-                    ? () => _selectRequisition(context, requisition, user)
-                    : null,
+                // onTap: user.isAdmin
+                //     ? () => _selectRequisition(context, requisition, user)
+                //     : null,
+                onTap: () => _selectRequisition(context, requisition, user),
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
@@ -140,12 +253,49 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                             Expanded(
                               child: Text(
                                 documents[i]['nameDepartment'] +
-                                    DateFormat(' - dd/MM/y - HH:MM').format(
+                                    ' - ' +
+                                    DateFormat('dd/MM/y - HH:mm:ss').format(
                                         documents[i]['createdAt'].toDate()),
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
+                              // child: Text(
+                              //   documents[i]['nameDepartment'] +
+                              //       ' - ' +
+                              //       documents[i]['createdAt']
+                              //           .toDate()
+                              //           .subtract(Duration(hours: 3))
+                              //           .day
+                              //           .toString() +
+                              //       '/' +
+                              //       documents[i]['createdAt']
+                              //           .toDate()
+                              //           .subtract(Duration(hours: 3))
+                              //           .month
+                              //           .toString() +
+                              //       '/' +
+                              //       documents[i]['createdAt']
+                              //           .toDate()
+                              //           .subtract(Duration(hours: 3))
+                              //           .year
+                              //           .toString() +
+                              //       ' - ' +
+                              //       documents[i]['createdAt']
+                              //           .toDate()
+                              //           .subtract(Duration(hours: 3))
+                              //           .hour
+                              //           .toString() +
+                              //       ':' +
+                              //       documents[i]['createdAt']
+                              //           .toDate()
+                              //           .subtract(Duration(hours: 3))
+                              //           .minute
+                              //           .toString(),
+                              //   style: TextStyle(
+                              //     fontWeight: FontWeight.bold,
+                              //   ),
+                              // ),
                             ),
                             if (documents[i]['status'] == 'PENDENTE' &&
                                 documents[i]['idUserRequested'] == user.id)
@@ -177,11 +327,15 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                                       });
                                 },
                               ),
-                            // IconButton(
-                            // icon: Icon(Icons.delete),
-                            // color: Theme.of(context).errorColor,
-                            // onPressed: () => null,
-                            // ),
+                            if (documents[i]['status'] != 'PENDENTE')
+                              Text(
+                                documents[i]['number'] != null
+                                    ? 'Nº: ${documents[i]['number'].toString()}'
+                                    : 'Nº: ---',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                           ],
                         ),
                       ),

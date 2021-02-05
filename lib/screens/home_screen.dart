@@ -151,13 +151,20 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Column(
                 children: [
-                  // Container(
-                  //   height: availableHeight * 0.15,
-                  //   padding: EdgeInsets.all(30.0),
-                  //   child: Chart(),
-                  // ),
+                  if (user.isAdmin)
+                    Container(
+                      height: availableHeight * 0.2,
+                      padding: EdgeInsets.all(2.0),
+                      child: MenuCard(
+                        title: "Relatorio",
+                        icon: Icons.file_copy,
+                        color: Colors.orange,
+                        url: AppRoutes.RELATORIOS,
+                        user: user,
+                      ),
+                    ),
                   Container(
-                    height: availableHeight * 0.85,
+                    height: availableHeight * 0.8,
                     padding: EdgeInsets.all(30.0),
                     child: GridView.count(
                       crossAxisCount: 2,

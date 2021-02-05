@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:requisition_app/components/provider_form.dart';
+import 'package:requisition_app/components/provider_update_form.dart';
 import 'package:requisition_app/models/provider.dart';
 import 'package:requisition_app/utils/app_routes.dart';
 
@@ -23,26 +24,48 @@ class _ProvidersScreenState extends State<ProvidersScreen> {
   Future<void> _addProvider(Provider provider) async {
     Navigator.of(context).pop();
 
-    // final Department newDepartment = Department(
-    //   id: null,
-    //   name: name,
-    // );
-
     await FirebaseFirestore.instance.collection('providers').add({
-      'fantasyName': provider.fantasyName,
-      'email': provider.email,
-      'address': provider.address,
-      'city': provider.city,
-      'uf': provider.uf,
+      'fantasyName': provider.fantasyName.toUpperCase(),
+      'email': provider.email.toLowerCase(),
+      'address': provider.address.toUpperCase(),
+      'city': provider.city.toUpperCase(),
+      'uf': provider.uf.toUpperCase(),
+      'excluded': false,
     });
   }
 
-  // void _selectDepartment(BuildContext context, Department department) {
-  //   Navigator.of(context).pushNamed(
-  //     AppRoutes.SECTORS,
-  //     arguments: department,
-  //   );
-  // }
+  _openProviderUpdateFormModal(context, provider) {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) {
+        return ProviderUpdateForm(_updateProvider, provider);
+      },
+    );
+  }
+
+  Future<void> _updateProvider(Provider provider) async {
+    Navigator.of(context).pop();
+
+    await FirebaseFirestore.instance
+        .collection('providers')
+        .doc(provider.id)
+        .update({
+      'fantasyName': provider.fantasyName.toUpperCase(),
+      'email': provider.email.toLowerCase(),
+      'address': provider.address.toUpperCase(),
+      'city': provider.city.toUpperCase(),
+      'uf': provider.uf.toUpperCase(),
+    });
+  }
+
+  Future<void> _deleteProvider(Provider provider) async {
+    Navigator.of(context).pop();
+
+    await FirebaseFirestore.instance
+        .collection('providers')
+        .doc(provider.id)
+        .update({'excluded': true});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +109,7 @@ class _ProvidersScreenState extends State<ProvidersScreen> {
         child: StreamBuilder(
           stream: FirebaseFirestore.instance
               .collection('providers')
+              .where('excluded', isEqualTo: false)
               .orderBy('fantasyName')
               .snapshots(),
           builder: (ctx, snapshot) {
@@ -100,33 +124,61 @@ class _ProvidersScreenState extends State<ProvidersScreen> {
             return ListView.builder(
               itemCount: documents.length,
               itemBuilder: (ctx, i) {
-                // final Department department = Department(
-                //   id: documents[i].id,
-                //   name: documents[i]['name'],
-                // );
+                final Provider provider = Provider(
+                  id: documents[i].id,
+                  fantasyName: documents[i]['fantasyName'],
+                  email: documents[i]['email'],
+                  address: documents[i]['address'],
+                  city: documents[i]['city'],
+                  uf: documents[i]['uf'],
+                  excluded: documents[i]['excluded'],
+                );
                 return Container(
                   child: Card(
                     elevation: 1,
                     child: ListTile(
                       title: Text(documents[i]['fantasyName']),
                       subtitle: Text(documents[i]['email']),
-                      // trailing: Container(
-                      //   width: 100,
-                      //   child: Row(
-                      //     children: [
-                      //       IconButton(
-                      //         icon: Icon(Icons.edit),
-                      //         onPressed: () {},
-                      //         color: Colors.orange,
-                      //       ),
-                      //       IconButton(
-                      //         icon: Icon(Icons.delete),
-                      //         color: Theme.of(context).errorColor,
-                      //         onPressed: () => null,
-                      //       ),
-                      //     ],
-                      //   ),
-                      // ),
+                      trailing: Container(
+                        width: 100,
+                        child: Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () => _openProviderUpdateFormModal(
+                                  context, provider),
+                              color: Colors.orange,
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete),
+                              color: Theme.of(context).errorColor,
+                              onPressed: () {
+                                return showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Text("Confirmação"),
+                                        content: Text(
+                                            "Você deseja excluir o Fornecedor ${provider.fantasyName} ?"),
+                                        actions: [
+                                          FlatButton(
+                                            child: Text('Cancel'),
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
+                                          ),
+                                          FlatButton(
+                                            child: Text('Continuar'),
+                                            onPressed: () =>
+                                                _deleteProvider(provider),
+                                          ),
+                                        ],
+                                      );
+                                    });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
                       // onTap: () => null,
                       // onTap: () => _selectDepartment(context, department),
                       // leading: Text('T'),

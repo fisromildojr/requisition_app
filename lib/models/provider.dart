@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 class Provider {
   String id;
   String fantasyName;
@@ -7,6 +5,7 @@ class Provider {
   String address;
   String city;
   String uf;
+  bool excluded = false;
 
   Provider({
     this.id,
@@ -15,5 +14,6 @@ class Provider {
     this.address,
     this.city,
     this.uf,
+    this.excluded,
   });
 }

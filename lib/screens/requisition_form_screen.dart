@@ -1,21 +1,19 @@
-import 'dart:convert';
-
+import 'package:requisition_app/components/category_list.dart';
+import 'package:requisition_app/models/category.dart';
+import 'package:requisition_app/utils/app_routes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:flutter/material.dart';
-import 'package:requisition_app/components/category_list.dart';
 
 import 'package:requisition_app/components/departments_list_requisition.dart';
 import 'package:requisition_app/components/provider_list.dart';
 import 'package:requisition_app/components/sector_list_requisition.dart';
 import 'package:requisition_app/models/auth_data.dart';
-import 'package:requisition_app/models/category.dart';
 import 'package:requisition_app/models/department.dart';
 import 'package:requisition_app/models/provider.dart';
 import 'package:requisition_app/models/sector.dart';
 
 import 'package:intl/intl.dart';
-import 'package:requisition_app/utils/app_routes.dart';
 
 class RequisitionFormScreen extends StatefulWidget {
   @override
@@ -36,6 +34,7 @@ class _RequisitionFormScreenState extends State<RequisitionFormScreen> {
   final _nameSectorController = TextEditingController();
   final _nameCategoryController = TextEditingController();
   final _valueController = MoneyMaskedTextController();
+  final _docProviderController = TextEditingController();
 
   DateTime _selectedPurchaseDate;
   DateTime _selectedPaymentForecastDate;
@@ -161,7 +160,7 @@ class _RequisitionFormScreenState extends State<RequisitionFormScreen> {
       );
       await FirebaseFirestore.instance.collection('requisitions').add({
         'solvedIn': null,
-        'createdAt': Timestamp.now(),
+        'createdAt': DateTime.now(),
         'description': _descriptionController.text,
         'idCategory': selectedCategory.id,
         'idDepartment': selectedDepartment.id,
@@ -172,6 +171,8 @@ class _RequisitionFormScreenState extends State<RequisitionFormScreen> {
         'nameDepartment': selectedDepartment.name,
         'nameProvider': selectedProvider.fantasyName,
         'emailProvider': selectedProvider.email,
+        'number': null,
+        'docProvider': _docProviderController.text.toUpperCase(),
         'nameSector': selectedSector.name,
         'nameUserRequested': user.name,
         'paymentForecastDate': _selectedPaymentForecastDate,
@@ -204,7 +205,7 @@ class _RequisitionFormScreenState extends State<RequisitionFormScreen> {
                   key: ValueKey('purchaseDate'),
                   controller: _purchaseDateController,
                   readOnly: true,
-                  decoration: InputDecoration(labelText: 'Data da Compra'),
+                  decoration: InputDecoration(labelText: 'Data da Compra*'),
                   validator: (value) {
                     if (value.isEmpty) {
                       return 'Selecione uma Data...';
@@ -217,7 +218,7 @@ class _RequisitionFormScreenState extends State<RequisitionFormScreen> {
                   key: ValueKey('department'),
                   controller: _nameDepartmentController,
                   readOnly: true,
-                  decoration: InputDecoration(labelText: 'Departamento'),
+                  decoration: InputDecoration(labelText: 'Departamento*'),
                   validator: (value) {
                     if (value.isEmpty) {
                       return 'Selecione um Departamento...';
@@ -230,7 +231,7 @@ class _RequisitionFormScreenState extends State<RequisitionFormScreen> {
                   key: ValueKey('sector'),
                   controller: _nameSectorController,
                   readOnly: true,
-                  decoration: InputDecoration(labelText: 'Centro de Custo'),
+                  decoration: InputDecoration(labelText: 'Centro de Custo*'),
                   validator: (value) {
                     if (value.isEmpty) {
                       return 'Selecione um Centro de Custo...';
@@ -248,7 +249,7 @@ class _RequisitionFormScreenState extends State<RequisitionFormScreen> {
                   key: ValueKey('provider'),
                   controller: _fantasyNameProviderController,
                   readOnly: true,
-                  decoration: InputDecoration(labelText: 'Fornecedor'),
+                  decoration: InputDecoration(labelText: 'Fornecedor*'),
                   validator: (value) {
                     if (value.isEmpty) {
                       return 'Selecione um Fornecedor...';
@@ -261,7 +262,8 @@ class _RequisitionFormScreenState extends State<RequisitionFormScreen> {
                   key: ValueKey('category'),
                   controller: _nameCategoryController,
                   readOnly: true,
-                  decoration: InputDecoration(labelText: 'Categoria da Compra'),
+                  decoration:
+                      InputDecoration(labelText: 'Categoria da Compra*'),
                   validator: (value) {
                     if (value.isEmpty) {
                       return 'Selecione uma Categoria...';
@@ -273,7 +275,7 @@ class _RequisitionFormScreenState extends State<RequisitionFormScreen> {
                 TextFormField(
                   key: ValueKey('value'),
                   controller: _valueController,
-                  decoration: InputDecoration(labelText: 'Valor'),
+                  decoration: InputDecoration(labelText: 'Valor*'),
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (_valueController.numberValue <= 0.00) {
@@ -287,7 +289,7 @@ class _RequisitionFormScreenState extends State<RequisitionFormScreen> {
                   controller: _paymentForecastDateController,
                   readOnly: true,
                   decoration: InputDecoration(
-                      labelText: 'Data Prevista para Pagamento'),
+                      labelText: 'Data Prevista para Pagamento*'),
                   validator: (value) {
                     if (value.isEmpty) {
                       return 'Selecione uma Data...';
@@ -297,9 +299,21 @@ class _RequisitionFormScreenState extends State<RequisitionFormScreen> {
                   onTap: _showPaymentForecastDatePicker,
                 ),
                 TextFormField(
+                  key: ValueKey('docProvider'),
+                  controller: _docProviderController,
+                  decoration:
+                      InputDecoration(labelText: 'Nr Documento do Fornecedor'),
+                  // validator: (value) {
+                  // if (value.isEmpty || value.length < 3) {
+                  //   return 'Descrição da compra...';
+                  // }
+                  // return null;
+                  // },
+                ),
+                TextFormField(
                   key: ValueKey('description'),
                   controller: _descriptionController,
-                  decoration: InputDecoration(labelText: 'Descrição'),
+                  decoration: InputDecoration(labelText: 'Descrição*'),
                   validator: (value) {
                     if (value.isEmpty || value.length < 3) {
                       return 'Descrição da compra...';

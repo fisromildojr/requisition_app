@@ -1,3 +1,4 @@
+import 'package:requisition_app/models/auth_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -13,63 +14,30 @@ class RequisitionDetailsScreen extends StatefulWidget {
 
 class _RequisitionDetailsScreenState extends State<RequisitionDetailsScreen> {
   Future<void> _aproveRequisition(
-      BuildContext context, Requisition requisition) async {
+      BuildContext context, Requisition requisition, AuthData user) async {
     Navigator.of(context).pop();
-    final userAuth = FirebaseAuth.instance.currentUser;
-    final user = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(userAuth.uid)
-        .get();
 
     FirebaseFirestore.instance
         .collection('requisitions')
         .doc(requisition.id)
         .update({
-      'solvedByName': user.get('name'),
-      'solvedById': userAuth.uid,
+      'solvedByName': user.name,
+      'solvedById': user.id,
       'status': 'APROVADO',
-      'approvedIn': Timestamp.now(),
-    }).then((_) {
-      if (requisition.emailProvider.isNotEmpty ||
-          requisition.emailProvider != null)
-        FirebaseFirestore.instance.collection('mail').add({
-          'to': requisition.emailProvider,
-          'message': {
-            'subject': 'Requisição Aprovada',
-            'text': 'Foi aprovada uma requisição para o colaborador ' +
-                requisition.nameUserRequested,
-            'html': "<div style='margin:0 auto'><table style='text-align:center;font-size:15px;border:1px'><tr><td><br>Requisição</td></tr><tr><td style='font-size:20px;font-weight:bold'>" +
-                requisition.id +
-                "</td></tr><tr><td><br>Data da Aprova&ccedil;&atilde;o</td></tr><tr><td style='font-size:20px;font-weight:bold'>" +
-                DateFormat('dd/MM/y').format(requisition.createdAt.toDate()) +
-                "</td></tr><tr><td><br>Valor</td></tr><tr><td style='font-size:20px;font-weight:bold'>R\$ " +
-                requisition.value.toStringAsFixed(2) +
-                "</td></tr><tr><td><br>Solicitada por:</td></tr><tr><td style='font-size:20px;font-weight:bold'>" +
-                requisition.nameUserRequested +
-                "</td></tr><tr><td><br>" +
-                requisition.status +
-                " por </td></tr><tr><td style='font-size:20px;font-weight:bold'>" +
-                requisition.solvedByName +
-                "</td></tr></table></div>",
-          },
-        });
+      'solvedIn': DateTime.now(),
     });
   }
 
   Future<void> _disapproveRequisition(
-      BuildContext context, Requisition requisition) async {
+      BuildContext context, Requisition requisition, AuthData user) async {
     Navigator.of(context).pop();
-    final userAuth = FirebaseAuth.instance.currentUser;
-    final user = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(userAuth.uid)
-        .get();
+
     await FirebaseFirestore.instance
         .collection('requisitions')
         .doc(requisition.id)
         .update({
-      'solvedByName': user.get('name'),
-      'solvedById': userAuth.uid,
+      'solvedByName': user.name,
+      'solvedById': user.id,
       'status': 'NEGADO',
       'solvedIn': DateTime.now(),
     });
@@ -77,10 +45,10 @@ class _RequisitionDetailsScreenState extends State<RequisitionDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // final userAuth = FirebaseAuth.instance.currentUser;
-    final requisition =
-        ModalRoute.of(context).settings.arguments as Requisition;
-    final user = FirebaseAuth.instance.currentUser;
+    final Map arguments = ModalRoute.of(context).settings.arguments as Map;
+    final requisition = arguments['requisition'] as Requisition;
+    final user = arguments['user'] as AuthData;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Detalhes'),
@@ -135,20 +103,32 @@ class _RequisitionDetailsScreenState extends State<RequisitionDetailsScreen> {
               margin: EdgeInsets.all(2),
               child: Column(
                 children: [
-                  Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
-                        child: Text(
-                          requisition.nameDepartment +
-                              DateFormat(' - dd/MM/y - HH:MM')
-                                  .format(requisition.createdAt.toDate()),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            requisition.nameDepartment +
+                                ' - ' +
+                                DateFormat('dd/MM/y - HH:mm:ss')
+                                    .format(requisition.createdAt.toDate()),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        // if (requisition.status != 'PENDENTE')
+                        Text(
+                          requisition.number != null
+                              ? 'Nº: ${requisition.number.toString()}'
+                              : 'Nº: ---',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
@@ -185,6 +165,23 @@ class _RequisitionDetailsScreenState extends State<RequisitionDetailsScreen> {
                       ],
                     ),
                   ),
+                  if (requisition.docProvider.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Documento do Fornecedor: ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(requisition.docProvider),
+                          ),
+                        ],
+                      ),
+                    ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
                     child: Row(
@@ -313,55 +310,58 @@ class _RequisitionDetailsScreenState extends State<RequisitionDetailsScreen> {
                       ),
                     ],
                   ),
-                  Row(
-                    // mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      if (requisition.status == 'NEGADO' &&
-                              requisition.solvedById == user.uid ||
-                          requisition.status == 'PENDENTE')
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            RaisedButton(
-                              elevation: 5,
-                              color: Colors.green,
-                              child: Text(
-                                'Aprovar',
+                  if (user.isAdmin)
+                    Row(
+                      // mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        if (requisition.status == 'NEGADO' &&
+                                requisition.solvedById == user.id ||
+                            requisition.status == 'PENDENTE')
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              RaisedButton(
+                                elevation: 5,
+                                color: Colors.green,
+                                child: Text(
+                                  'Aprovar',
+                                ),
+                                onPressed: () => _aproveRequisition(
+                                  context,
+                                  requisition,
+                                  user,
+                                ),
                               ),
-                              onPressed: () => _aproveRequisition(
-                                context,
-                                requisition,
+                            ],
+                          ),
+                        if (requisition.status == 'NEGADO' &&
+                                requisition.solvedById == user.id ||
+                            requisition.status == 'PENDENTE')
+                          SizedBox(
+                            width: 20,
+                          ),
+                        if (requisition.status == 'PENDENTE')
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              RaisedButton(
+                                elevation: 5,
+                                color: Colors.red,
+                                child: Text(
+                                  'Reprovar',
+                                ),
+                                onPressed: () => _disapproveRequisition(
+                                  context,
+                                  requisition,
+                                  user,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      if (requisition.status == 'NEGADO' &&
-                              requisition.solvedById == user.uid ||
-                          requisition.status == 'PENDENTE')
-                        SizedBox(
-                          width: 20,
-                        ),
-                      if (requisition.status == 'PENDENTE')
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            RaisedButton(
-                              elevation: 5,
-                              color: Colors.red,
-                              child: Text(
-                                'Reprovar',
-                              ),
-                              onPressed: () => _disapproveRequisition(
-                                context,
-                                requisition,
-                              ),
-                            ),
-                          ],
-                        ),
-                    ],
-                  ),
+                            ],
+                          ),
+                      ],
+                    ),
                 ],
               ),
             ),

@@ -13,4 +13,5 @@ class AppRoutes {
   static const USER_DETAILS = '/details_user_screen';
   static const REQUISITION_DETAILS = '/details_requisition_screen';
   static const CATEGORIES = '/categories_screen';
+  static const RELATORIOS = '/reports_screen';
 }

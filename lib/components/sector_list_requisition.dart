@@ -26,6 +26,7 @@ class _SectorListRequisitionState extends State<SectorListRequisition> {
           .collection('departments')
           .doc(widget.department.id)
           .collection('sectors')
+          .orderBy('name')
           .snapshots(),
       builder: (ctx, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {

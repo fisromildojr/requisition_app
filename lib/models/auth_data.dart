@@ -1,5 +1,3 @@
-import 'package:requisition_app/models/department.dart';
-
 enum AuthMode {
   LOGIN,
   SIGNUP,

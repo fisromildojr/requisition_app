@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:requisition_app/components/department_form.dart';
+import 'package:requisition_app/components/department_update_form.dart';
 import 'package:requisition_app/models/department.dart';
 import 'package:requisition_app/utils/app_routes.dart';
 
@@ -25,11 +26,12 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
 
     final Department newDepartment = Department(
       id: null,
-      name: name,
+      name: name.toUpperCase(),
     );
 
     await FirebaseFirestore.instance.collection('departments').add({
       'name': newDepartment.name,
+      'excluded': false,
     });
   }
 
@@ -43,12 +45,11 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
         .snapshots()
         .forEach((snapshotSectors) {
       snapshotSectors.docs.forEach((docSector) {
-        docSector.reference.delete().then((_) {
+        docSector.reference.update({'excluded': true}).then((_) {
           FirebaseFirestore.instance
               .collection('departments')
               .doc(department.id)
-              .delete()
-              .then((_) {
+              .update({'excluded': true}).then((_) {
             FirebaseFirestore.instance
                 .collection('users')
                 .snapshots()
@@ -88,11 +89,36 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
         }
       });
     });
+  }
 
-    // print(users[].id;
+  _openDepartmentUpdateFormModal(context, department) {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) {
+        return DepartmentUpdateForm(_updateDepartment, department);
+      },
+    );
+  }
 
-    // Navigator.of(context).pop();
-    // print('Excluindo o departamento: ${department.name}');
+  Future<void> _updateDepartment(department) async {
+    Navigator.of(context).pop();
+
+    FirebaseFirestore.instance
+        .collection('departments')
+        .doc(department.id)
+        .update({'name': department.name.toUpperCase()}).then((_) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .snapshots()
+          .forEach((snapshotUsers) {
+        snapshotUsers.docs.forEach((docUser) {
+          docUser.reference
+              .collection('departments')
+              .doc(department.id)
+              .update({'name': department.name.toUpperCase()});
+        });
+      });
+    });
   }
 
   void showAlert() {
@@ -160,6 +186,7 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('departments')
+            .where('excluded', isEqualTo: false)
             .orderBy('name')
             .snapshots(),
         builder: (ctx, snapshot) {
@@ -186,32 +213,45 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
                     // onTap: () => null,
                     onTap: () => _selectDepartment(context, department),
                     // leading: Text('T'),
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete),
-                      color: Theme.of(context).errorColor,
-                      onPressed: () {
-                        return showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: Text("Confirmação"),
-                                content: Text(
-                                    "Você deseja excluir o departamento ${department.name} ?"),
-                                actions: [
-                                  FlatButton(
-                                    child: Text('Cancel'),
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(),
-                                  ),
-                                  FlatButton(
-                                    child: Text('Continuar'),
-                                    onPressed: () =>
-                                        _deleteDepartment(department),
-                                  ),
-                                ],
-                              );
-                            });
-                      },
+                    trailing: Container(
+                      width: 100,
+                      child: Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () => _openDepartmentUpdateFormModal(
+                                context, department),
+                            color: Colors.orange,
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.delete),
+                            color: Theme.of(context).errorColor,
+                            onPressed: () {
+                              return showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text("Confirmação"),
+                                      content: Text(
+                                          "Você deseja excluir o Departamento ${department.name} ?"),
+                                      actions: [
+                                        FlatButton(
+                                          child: Text('Cancel'),
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
+                                        ),
+                                        FlatButton(
+                                          child: Text('Continuar'),
+                                          onPressed: () =>
+                                              _deleteDepartment(department),
+                                        ),
+                                      ],
+                                    );
+                                  });
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

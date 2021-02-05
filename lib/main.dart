@@ -1,18 +1,19 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:requisition_app/screens/auth_screen.dart';
 import 'package:requisition_app/screens/categories_screen.dart';
-import 'package:requisition_app/screens/requisition_form_screen.dart';
 import 'package:requisition_app/screens/departments_screen.dart';
 import 'package:requisition_app/screens/details_requisition_screen.dart';
 import 'package:requisition_app/screens/details_user_screen.dart';
 import 'package:requisition_app/screens/home_screen.dart';
 import 'package:requisition_app/screens/providers_screen.dart';
+import 'package:requisition_app/screens/reports_screen.dart';
+import 'package:requisition_app/screens/requisition_form_screen.dart';
 import 'package:requisition_app/screens/requisitions_screen.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:requisition_app/screens/sectors_screen.dart';
 import 'package:requisition_app/screens/users_screen.dart';
 import 'package:requisition_app/utils/app_routes.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,19 +21,17 @@ void main() async {
   runApp(MyApp());
 }
 
-//Comentario Teste
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        primarySwatch: Colors.pink,
-        backgroundColor: Colors.pink,
+        primarySwatch: Colors.orange,
+        backgroundColor: Colors.orange,
         accentColor: Colors.deepPurple,
         accentColorBrightness: Brightness.dark,
         buttonTheme: ButtonTheme.of(context).copyWith(
-          buttonColor: Colors.pink,
+          buttonColor: Colors.orange,
           textTheme: ButtonTextTheme.primary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -64,6 +63,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.USER_DETAILS: (ctx) => UserDetailsScreen(),
         AppRoutes.REQUISITION_DETAILS: (ctx) => RequisitionDetailsScreen(),
         AppRoutes.CATEGORIES: (ctx) => CategoriesScreen(),
+        AppRoutes.RELATORIOS: (ctx) => ReportsScreen(),
       },
     );
   }

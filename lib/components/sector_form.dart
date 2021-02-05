@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:requisition_app/models/department.dart';
 import 'package:requisition_app/models/sector.dart';
 
 class SectorForm extends StatefulWidget {
