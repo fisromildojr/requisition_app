@@ -55,7 +55,7 @@ exports.updateRequisition = functions.firestore
 
             let options = {
                 dateStyle: ('short'),
-                timeStyle: ('short'),
+                // timeStyle: ('short'),
             }
             const createdAt = change.after.data().createdAt.toDate().toLocaleDateString('pt-br', options);
             const solvedIn = change.after.data().solvedIn.toDate().toLocaleDateString('pt-br', options);
@@ -64,7 +64,7 @@ exports.updateRequisition = functions.firestore
                 'to': change.after.data().emailProvider,
                 'message': {
                     'subject': 'Requisição Aprovada',
-                    'html': "<table><tbody><tr><td><img src='https://firebasestorage.googleapis.com/v0/b/tcc---requisition-app.appspot.com/o/cropped.png?alt=media&token=57bfe60c-2ea6-4c8d-bf56-b02b21a9edfa' style='height: 50px' /></td><td style='font-weight: bold'>REQUISIÇÃO (TCC II)</td></tr><tr><td colspan='2'><hr /></td></tr><tr><td style='font-weight: bold'>N° Requisição</td><td>" + change.after.data().number + "</td></tr><tr><td style='font-weight: bold'>Data da Solicitação:</td><td>" + createdAt + "</td></tr><tr><td style='font-weight: bold'>Data da Aprovação:</td><td>" + solvedIn + "</td></tr><tr><td style='font-weight: bold'>Solicitante:</td><td>" + change.after.data().nameUserRequested + "</td></tr><tr><td style='font-weight: bold'>Aprovado por:</td><td>" + change.after.data().solvedByName + "</td></tr><tr><td style='font-weight: bold'>Fornecedor:</td><td>" + change.after.data().nameProvider + "</td></tr><tr><td style='font-weight: bold'>N° Doc.  Forn.:</td><td>" + change.after.data().docProvider + "</td></tr><tr><td style='font-weight: bold'>Valor:</td><td>R$ " + change.after.data().value + "</td></tr><tr><td style='font-weight: bold'>Descrição:</td><td>" + change.after.data().description + "</td></tr><tr><td colspan='2'><hr /></td></tr></tbody></table>",
+                    'html': "<table><tbody><tr><td><img src='https://firebasestorage.googleapis.com/v0/b/tcc---requisition-app.appspot.com/o/cropped.png?alt=media&token=522161d9-906b-4ce5-9bb5-dad356daabeb' style='height: 50px' /></td><td style='font-weight: bold'>REQUISIÇÃO (TCC II)</td></tr><tr><td colspan='2'><hr /></td></tr><tr><td style='font-weight: bold'>N° Requisição</td><td>" + change.after.data().number + "</td></tr><tr><td style='font-weight: bold'>Data da Solicitação:</td><td>" + createdAt + "</td></tr><tr><td style='font-weight: bold'>Data da Aprovação:</td><td>" + solvedIn + "</td></tr><tr><td style='font-weight: bold'>Solicitante:</td><td>" + change.after.data().nameUserRequested + "</td></tr><tr><td style='font-weight: bold'>Aprovado por:</td><td>" + change.after.data().solvedByName + "</td></tr><tr><td style='font-weight: bold'>Fornecedor:</td><td>" + change.after.data().nameProvider + "</td></tr><tr><td style='font-weight: bold'>N° Doc.  Forn.:</td><td>" + change.after.data().docProvider + "</td></tr><tr><td style='font-weight: bold'>Valor:</td><td>R$ " + change.after.data().value + "</td></tr><tr><td style='font-weight: bold'>Descrição:</td><td>" + change.after.data().description + "</td></tr><tr><td colspan='2'><hr /></td></tr></tbody></table>",
                 },
             })
         }
