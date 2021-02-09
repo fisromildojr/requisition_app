@@ -48,7 +48,7 @@ class _AuthScreenState extends State<AuthScreen> {
       }
     } catch (err) {
       var msg = err.code ?? 'Ocorreu um erro! Verifique suas credenciais!';
-      if (err.code == "too-many-requests") msg = "Senha inválida...";
+      if (err.code == "wrong-password") msg = "Senha inválida...";
       if (err.code == "user-not-found") msg = "Usuário não encontrado...";
       if (err.code == "unknown") msg = "Verifique sua conexão!";
       if (err.code == "too-many-requests")
@@ -77,12 +77,15 @@ class _AuthScreenState extends State<AuthScreen> {
       key: _scaffoldKey,
       backgroundColor: Colors.green[100],
       body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                height: 300,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 40, 0, 0),
+              child: Container(
+                height: 250,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -91,25 +94,25 @@ class _AuthScreenState extends State<AuthScreen> {
                   // fit: BoxFit.cover,
                 ),
               ),
-              Stack(
-                children: [
-                  AuthForm(_handleSubmit),
-                  if (_isLoading)
-                    Positioned.fill(
-                      child: Container(
-                        margin: EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(0, 0, 0, 0.5),
-                        ),
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
+            ),
+            Stack(
+              children: [
+                AuthForm(_handleSubmit),
+                if (_isLoading)
+                  Positioned.fill(
+                    child: Container(
+                      margin: EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Color.fromRGBO(0, 0, 0, 0.5),
+                      ),
+                      child: Center(
+                        child: CircularProgressIndicator(),
                       ),
                     ),
-                ],
-              ),
-            ],
-          ),
+                  ),
+              ],
+            ),
+          ],
         ),
       ),
     );
