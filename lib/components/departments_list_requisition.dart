@@ -28,6 +28,7 @@ class _DepartmentListRequisitionState extends State<DepartmentListRequisition> {
       stream: widget.user.isAdmin
           ? FirebaseFirestore.instance
               .collection('departments')
+              .where('excluded', isEqualTo: false)
               .orderBy('name')
               .snapshots()
           : FirebaseFirestore.instance
@@ -43,7 +44,7 @@ class _DepartmentListRequisitionState extends State<DepartmentListRequisition> {
         }
 
         final documents = snapshot.data.documents;
-        print('Retornado' + documents.length.toString());
+
         return ListView.builder(
           itemCount: documents.length,
           itemBuilder: (ctx, i) {

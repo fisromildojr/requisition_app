@@ -168,6 +168,12 @@ class _ReportsFormState extends State<ReportsForm> {
           filterReports.sector != null &&
           filterReports.provider != null &&
           filterReports.category != null) {
+        print(filterReports.initialDate);
+        print(filterReports.finalDate);
+        print(filterReports.department.name);
+        print(filterReports.sector.name);
+        print(filterReports.provider.fantasyName);
+        print(filterReports.category.name);
         Future futureFilter = FirebaseFirestore.instance
             .collection('requisitions')
             .where('createdAt', isGreaterThanOrEqualTo: _selectedInitialDate)
@@ -190,6 +196,9 @@ class _ReportsFormState extends State<ReportsForm> {
           filterReports.sector == null &&
           filterReports.provider == null &&
           filterReports.category == null) {
+        print(filterReports.initialDate);
+        print(filterReports.finalDate);
+
         Future futureFilter = FirebaseFirestore.instance
             .collection('requisitions')
             .where('createdAt', isGreaterThanOrEqualTo: _selectedInitialDate)
@@ -206,6 +215,10 @@ class _ReportsFormState extends State<ReportsForm> {
           filterReports.sector == null &&
           filterReports.provider == null &&
           filterReports.category == null) {
+        print(filterReports.initialDate);
+        print(filterReports.finalDate);
+        print(filterReports.department.name);
+
         Future futureFilter = FirebaseFirestore.instance
             .collection('requisitions')
             .where('createdAt', isGreaterThanOrEqualTo: _selectedInitialDate)
@@ -223,6 +236,11 @@ class _ReportsFormState extends State<ReportsForm> {
           filterReports.sector != null &&
           filterReports.provider == null &&
           filterReports.category == null) {
+        print(filterReports.initialDate);
+        print(filterReports.finalDate);
+        print(filterReports.department.name);
+        print(filterReports.sector.name);
+
         Future futureFilter = FirebaseFirestore.instance
             .collection('requisitions')
             .where('createdAt', isGreaterThanOrEqualTo: _selectedInitialDate)
@@ -241,6 +259,10 @@ class _ReportsFormState extends State<ReportsForm> {
           filterReports.sector == null &&
           filterReports.provider != null &&
           filterReports.category == null) {
+        print(filterReports.initialDate);
+        print(filterReports.finalDate);
+        print(filterReports.provider.fantasyName);
+
         Future futureFilter = FirebaseFirestore.instance
             .collection('requisitions')
             .where('createdAt', isGreaterThanOrEqualTo: _selectedInitialDate)
@@ -258,6 +280,11 @@ class _ReportsFormState extends State<ReportsForm> {
           filterReports.sector == null &&
           filterReports.provider != null &&
           filterReports.category == null) {
+        print(filterReports.initialDate);
+        print(filterReports.finalDate);
+        print(filterReports.department.name);
+        print(filterReports.provider.fantasyName);
+
         Future futureFilter = FirebaseFirestore.instance
             .collection('requisitions')
             .where('createdAt', isGreaterThanOrEqualTo: _selectedInitialDate)
@@ -276,6 +303,9 @@ class _ReportsFormState extends State<ReportsForm> {
           filterReports.sector == null &&
           filterReports.provider == null &&
           filterReports.category != null) {
+        print(filterReports.initialDate);
+        print(filterReports.finalDate);
+        print(filterReports.category.name);
         Future futureFilter = FirebaseFirestore.instance
             .collection('requisitions')
             .where('createdAt', isGreaterThanOrEqualTo: _selectedInitialDate)
@@ -288,11 +318,16 @@ class _ReportsFormState extends State<ReportsForm> {
         widget.onSubmit(futureFilter);
       }
 
-// Filtro por departamento e categoria
+// Filtro por departamento, sector e categoria
       if (filterReports.department != null &&
           filterReports.sector != null &&
           filterReports.provider == null &&
           filterReports.category != null) {
+        print(filterReports.initialDate);
+        print(filterReports.finalDate);
+        print(filterReports.department.name);
+        print(filterReports.sector.name);
+        print(filterReports.category.name);
         Future futureFilter = FirebaseFirestore.instance
             .collection('requisitions')
             .where('createdAt', isGreaterThanOrEqualTo: _selectedInitialDate)
@@ -303,7 +338,29 @@ class _ReportsFormState extends State<ReportsForm> {
             .where('status', isEqualTo: 'APROVADO')
             .orderBy('createdAt', descending: true)
             .get();
+        print("Filtro departamento, setor e categoria...");
+        widget.onSubmit(futureFilter);
+      }
 
+      // Filtro por departamento e categoria
+      if (filterReports.department != null &&
+          filterReports.sector == null &&
+          filterReports.provider == null &&
+          filterReports.category != null) {
+        print(filterReports.initialDate);
+        print(filterReports.finalDate);
+        print(filterReports.department.name);
+        print(filterReports.category.name);
+        Future futureFilter = FirebaseFirestore.instance
+            .collection('requisitions')
+            .where('createdAt', isGreaterThanOrEqualTo: _selectedInitialDate)
+            .where('createdAt', isLessThanOrEqualTo: _selectedFinalDate)
+            .where('idDepartment', isEqualTo: filterReports.department.id)
+            .where('idCategory', isEqualTo: filterReports.category.id)
+            .where('status', isEqualTo: 'APROVADO')
+            .orderBy('createdAt', descending: true)
+            .get();
+        print("Filtro departamento e categoria...");
         widget.onSubmit(futureFilter);
       }
     }
@@ -373,7 +430,7 @@ class _ReportsFormState extends State<ReportsForm> {
                           controller: _nameSectorController,
                           readOnly: true,
                           decoration:
-                              InputDecoration(labelText: 'Centro de Custo*'),
+                              InputDecoration(labelText: 'Centro de Custo'),
                           // validator: (value) {
                           //   if (value.isEmpty) {
                           //     return 'Selecione um Centro de Custo...';

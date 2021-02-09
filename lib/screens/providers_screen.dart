@@ -72,38 +72,6 @@ class _ProvidersScreenState extends State<ProvidersScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Fornecedores'),
-        actions: [
-          DropdownButtonHideUnderline(
-            child: DropdownButton(
-              icon: Icon(
-                Icons.more_vert,
-                color: Theme.of(context).primaryIconTheme.color,
-              ),
-              items: [
-                DropdownMenuItem(
-                  value: 'logout',
-                  child: Container(
-                    child: Row(
-                      children: [
-                        Icon(Icons.exit_to_app),
-                        SizedBox(width: 8),
-                        Text('Sair'),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-              onChanged: (item) {
-                if (item == 'logout') {
-                  FirebaseAuth.instance.signOut();
-                  Navigator.of(context).pushNamed(
-                    AppRoutes.HOME,
-                  );
-                }
-              },
-            ),
-          ),
-        ],
       ),
       body: Container(
         child: StreamBuilder(

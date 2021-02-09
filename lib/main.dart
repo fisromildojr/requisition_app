@@ -26,12 +26,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        primarySwatch: Colors.orange,
-        backgroundColor: Colors.orange,
+        primarySwatch: Colors.green,
+        backgroundColor: Colors.green,
         accentColor: Colors.deepPurple,
         accentColorBrightness: Brightness.dark,
         buttonTheme: ButtonTheme.of(context).copyWith(
-          buttonColor: Colors.orange,
+          buttonColor: Colors.green,
           textTheme: ButtonTextTheme.primary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -43,6 +43,11 @@ class MyApp extends StatelessWidget {
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (ctx, userSnapshot) {
+          if (userSnapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
           if (userSnapshot.hasData) {
             return HomeScreen();
           } else {
@@ -51,7 +56,6 @@ class MyApp extends StatelessWidget {
         },
       ),
       routes: {
-        AppRoutes.HOME: (ctx) => HomeScreen(),
         AppRoutes.REQUISITIONS: (ctx) => RequisitionsScreen(),
         AppRoutes.REQUISITION_FORM_SCREEN: (ctx) => RequisitionFormScreen(),
         AppRoutes.DEPARTMENTS: (ctx) => DepartmentsScreen(),

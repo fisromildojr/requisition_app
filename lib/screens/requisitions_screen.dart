@@ -56,7 +56,7 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                         children: [
                           Icon(
                             Icons.circle,
-                            color: Colors.green,
+                            color: Colors.green[400],
                           ),
                           SizedBox(width: 8),
                           Text('Aprovados'),
@@ -71,7 +71,7 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                         children: [
                           Icon(
                             Icons.circle,
-                            color: Colors.red,
+                            color: Colors.red[400],
                           ),
                           SizedBox(width: 8),
                           Text('Negados'),
@@ -86,7 +86,7 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                         children: [
                           Icon(
                             Icons.circle,
-                            color: Colors.amber,
+                            color: Colors.amber[400],
                           ),
                           SizedBox(width: 8),
                           Text('Pendentes'),
@@ -131,36 +131,6 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
               ),
             ),
           ),
-          // DropdownButtonHideUnderline(
-          //   child: DropdownButton(
-          //     icon: Icon(
-          //       Icons.more_vert,
-          //       color: Theme.of(context).primaryIconTheme.color,
-          //     ),
-          //     items: [
-          //       DropdownMenuItem(
-          //         value: 'logout',
-          //         child: Container(
-          //           child: Row(
-          //             children: [
-          //               Icon(Icons.exit_to_app),
-          //               SizedBox(width: 8),
-          //               Text('Sair'),
-          //             ],
-          //           ),
-          //         ),
-          //       ),
-          //     ],
-          //     onChanged: (item) {
-          //       if (item == 'logout') {
-          //         FirebaseAuth.instance.signOut();
-          //         Navigator.of(context).pushNamed(
-          //           AppRoutes.HOME,
-          //         );
-          //       }
-          //     },
-          //   ),
-          // ),
         ],
       ),
       body: StreamBuilder(
@@ -236,10 +206,10 @@ class _RequisitionsScreenState extends State<RequisitionsScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     color: documents[i]['status'] == 'PENDENTE'
-                        ? Colors.amber
+                        ? Colors.amber[400]
                         : documents[i]['status'] == 'NEGADO'
-                            ? Colors.red
-                            : Colors.green,
+                            ? Colors.red[400]
+                            : Colors.green[400],
                   ),
                   padding: EdgeInsets.all(6),
                   margin: EdgeInsets.all(2),

@@ -54,19 +54,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
       appBar: appBar,
       body: FutureBuilder(
           future: futureFilter,
-          // FirebaseFirestore.instance
-          //     .collection('requisitions')
-          //     .where('createdAt',
-          //         isGreaterThanOrEqualTo: _selectedInitialDate)
-          //     .where('createdAt', isLessThanOrEqualTo: _selectedFinalDate)
-          //     .orderBy('createdAt', descending: true)
-          //     .get(),
-          // FirebaseFirestore.instance
-          //     .collection('requisitions')
-          //     .where('createdAt', isGreaterThanOrEqualTo: dataInicial)
-          //     .where('createdAt', isLessThanOrEqualTo: dataFinal)
-          //     .orderBy('createdAt', descending: true)
-          //     .get(),
           builder: (ctx, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
@@ -118,11 +105,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
-                            color: requisition.status == 'PENDENTE'
-                                ? Colors.amber
-                                : requisition.status == 'NEGADO'
-                                    ? Colors.red
-                                    : Colors.green,
+                            color: documents[i]['status'] == 'PENDENTE'
+                                ? Colors.amber[400]
+                                : documents[i]['status'] == 'NEGADO'
+                                    ? Colors.red[400]
+                                    : Colors.green[400],
                           ),
                           padding: EdgeInsets.all(6),
                           margin: EdgeInsets.all(2),
@@ -135,10 +122,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        requisition.nameDepartment +
+                                        documents[i]['nameDepartment'] +
                                             ' - ' +
                                             DateFormat('dd/MM/y - HH:mm:ss')
-                                                .format(requisition.createdAt
+                                                .format(documents[i]
+                                                        ['createdAt']
                                                     .toDate()),
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
@@ -146,8 +134,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                       ),
                                     ),
                                     Text(
-                                      requisition.number != null
-                                          ? 'Nº: ${requisition.number.toString()}'
+                                      documents[i]['number'] != null
+                                          ? 'Nº: ${documents[i]['number'].toString()}'
                                           : 'Nº: ---',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -166,7 +154,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                   ),
                                   Flexible(
                                     child: Text(
-                                      requisition.description,
+                                      documents[i]['description'],
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -182,7 +170,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                   ),
                                   Flexible(
                                     child: Text(
-                                      requisition.nameProvider,
+                                      documents[i]['nameProvider'],
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -198,7 +186,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                   ),
                                   Flexible(
                                     child: Text(
-                                      requisition.nameDepartment,
+                                      documents[i]['nameDepartment'],
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -214,7 +202,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                   ),
                                   Flexible(
                                     child: Text(
-                                      requisition.nameSector,
+                                      documents[i]['nameSector'],
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -230,7 +218,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                   ),
                                   Flexible(
                                     child: Text(
-                                      requisition.nameCategory,
+                                      documents[i]['nameCategory'],
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -247,13 +235,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                     ),
                                     Flexible(
                                       child: Text(
-                                        requisition.nameUserRequested,
+                                        documents[i]['nameUserRequested'],
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ],
                                 ),
-                              if (requisition.status == 'PENDENTE')
+                              if (documents[i]['status'] == 'PENDENTE')
                                 Row(
                                   children: [
                                     Text(
@@ -264,13 +252,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                     ),
                                     Flexible(
                                       child: Text(
-                                        requisition.status,
+                                        documents[i]['status'],
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ],
                                 )
-                              else if (requisition.status == 'NEGADO')
+                              else if (documents[i]['status'] == 'NEGADO')
                                 Row(
                                   children: [
                                     Text(
@@ -281,7 +269,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                     ),
                                     Flexible(
                                       child: Text(
-                                        'Negado por ${requisition.solvedByName}',
+                                        'Negado por ${documents[i]['solvedByName']}',
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -298,7 +286,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                     ),
                                     Flexible(
                                       child: Text(
-                                        'Aprovado por ${requisition.solvedByName}',
+                                        'Aprovado por ${documents[i]['solvedByName']}',
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -308,7 +296,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Text(
-                                    'R\$ ${requisition.value.toStringAsFixed(2)}',
+                                    'R\$ ${documents[i]['value'].toStringAsFixed(2)}',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),

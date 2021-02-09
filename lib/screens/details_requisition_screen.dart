@@ -52,38 +52,6 @@ class _RequisitionDetailsScreenState extends State<RequisitionDetailsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Detalhes'),
-        actions: [
-          DropdownButtonHideUnderline(
-            child: DropdownButton(
-              icon: Icon(
-                Icons.more_vert,
-                color: Theme.of(context).primaryIconTheme.color,
-              ),
-              items: [
-                DropdownMenuItem(
-                  value: 'logout',
-                  child: Container(
-                    child: Row(
-                      children: [
-                        Icon(Icons.exit_to_app),
-                        SizedBox(width: 8),
-                        Text('Sair'),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-              onChanged: (item) {
-                if (item == 'logout') {
-                  FirebaseAuth.instance.signOut();
-                  Navigator.of(context).pushNamed(
-                    AppRoutes.HOME,
-                  );
-                }
-              },
-            ),
-          ),
-        ],
       ),
       body: ListView.builder(
         itemCount: 1,
@@ -94,10 +62,10 @@ class _RequisitionDetailsScreenState extends State<RequisitionDetailsScreen> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 color: requisition.status == 'PENDENTE'
-                    ? Colors.amber
+                    ? Colors.amber[400]
                     : requisition.status == 'NEGADO'
-                        ? Colors.red
-                        : Colors.green,
+                        ? Colors.red[400]
+                        : Colors.green[400],
               ),
               padding: EdgeInsets.all(6),
               margin: EdgeInsets.all(2),
@@ -118,7 +86,6 @@ class _RequisitionDetailsScreenState extends State<RequisitionDetailsScreen> {
                             ),
                           ),
                         ),
-                        // if (requisition.status != 'PENDENTE')
                         Text(
                           requisition.number != null
                               ? 'Nº: ${requisition.number.toString()}'
@@ -165,13 +132,32 @@ class _RequisitionDetailsScreenState extends State<RequisitionDetailsScreen> {
                       ],
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Data da Compra: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            DateFormat('dd/MM/y')
+                                .format(requisition.purchaseDate.toDate()),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   if (requisition.docProvider.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
                       child: Row(
                         children: [
                           Text(
-                            'Documento do Fornecedor: ',
+                            'Nr Documento do Fornecedor: ',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
@@ -182,6 +168,25 @@ class _RequisitionDetailsScreenState extends State<RequisitionDetailsScreen> {
                         ],
                       ),
                     ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Data Prevista para Pagamento: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            DateFormat('dd/MM/y').format(
+                                requisition.paymentForecastDate.toDate()),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
                     child: Row(

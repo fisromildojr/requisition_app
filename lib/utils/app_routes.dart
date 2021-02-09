@@ -1,4 +1,5 @@
 class AppRoutes {
+  static const LOGIN = '/auth_screen';
   static const HOME = '/home_screen';
   static const REQUISITIONS = '/requisitions_screen';
   static const REQUISITION_FORM_SCREEN = '/requisition_form_screen';
