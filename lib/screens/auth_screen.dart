@@ -56,6 +56,8 @@ class _AuthScreenState extends State<AuthScreen> {
             "Bloqueamos todas as solicitações deste dispositivo devido a atividade incomum. Tente mais tarde.";
       if (err.code == "user-disabled")
         msg = "Usuário desabilitado, procure o administrador!";
+      if (err.code == "email-already-in-use")
+        msg = "O email informado já está em uso, tente realizar o login...";
       print(err.code);
       print(err.message);
       _scaffoldKey.currentState.showSnackBar(
